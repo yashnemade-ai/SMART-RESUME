@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STREAMX - Premium Streaming</title>
+    <title>STREAMX</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -22,120 +22,115 @@
             --shadow: rgba(229, 9, 20, 0.4);
         }
 
+        [data-theme="light"] {
+            --bg: #f5f5f7;
+            --nav-bg: rgba(255, 255, 255, 0.9);
+            --card-bg: #ffffff;
+            --text: #1d1d1f;
+            --text-dim: #6e6e73;
+            --accent: #E50914;
+            --border: #d2d2d7;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
-        body { background-color: var(--bg); color: var(--text); overflow-x: hidden; }
+        body { background-color: var(--bg); color: var(--text); overflow-x: hidden; transition: background 0.3s; }
 
         /* --- NAVBAR --- */
         nav {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 12px 6%; background: var(--nav-bg);
+            padding: 10px 6%; background: var(--nav-bg);
             position: fixed; width: 100%; top: 0; z-index: 1000;
-            border-bottom: 1px solid var(--border); backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border); backdrop-filter: blur(15px);
         }
-        .logo { font-size: 28px; font-weight: 900; cursor: pointer; }
+        .logo { font-size: 26px; font-weight: 900; cursor: pointer; color: var(--text); text-decoration: none; }
         .logo span.red { color: var(--accent); }
 
-        /* --- SEARCH ANIMATION --- */
         .search-box {
-            background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+            background: rgba(120, 120, 120, 0.1); border: 1px solid var(--border);
             padding: 8px 18px; border-radius: 50px; display: flex; align-items: center;
-            transition: 0.4s; width: 220px;
+            transition: 0.4s; width: 200px;
         }
-        .search-box:focus-within { width: 320px; border-color: var(--accent); background: rgba(255,255,255,0.1); }
-        .search-box input { background: transparent; border: none; color: #fff; outline: none; width: 100%; margin-left: 10px; }
+        .search-box:focus-within { width: 300px; border-color: var(--accent); background: rgba(120, 120, 120, 0.15); }
+        .search-box input { background: transparent; border: none; color: var(--text); outline: none; width: 100%; margin-left: 10px; }
 
-        /* --- CINEMATIC BANNER --- */
-        .slider-container { width: 100%; height: 85vh; margin-top: 0; position: relative; overflow: hidden; }
+        .theme-btn { background: none; border: none; color: var(--text); font-size: 20px; cursor: pointer; padding: 5px; }
+
+        /* --- BANNER (ADJUSTED TEXT) --- */
+        .slider-container { width: 100%; height: 80vh; position: relative; overflow: hidden; background: #000; }
         .slider-wrapper { display: flex; height: 100%; transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
         .slide { min-width: 100%; height: 100%; position: relative; }
-        .slide img { width: 100%; height: 100%; object-fit: cover; transition: 8s ease-in-out; transform: scale(1); }
-        .slide.active img { transform: scale(1.1); } /* Ken Burns Effect */
+        .slide img { width: 100%; height: 100%; object-fit: cover; transition: 6s ease-in-out; }
+        .slide.active img { transform: scale(1.08); }
         
         .slide-overlay {
             position: absolute; inset: 0;
-            background: linear-gradient(to right, rgba(0,0,0,0.9) 20%, rgba(0,0,0,0.4) 50%, transparent 100%),
-                        linear-gradient(to top, var(--bg) 5%, transparent 40%);
+            background: linear-gradient(to right, rgba(0,0,0,0.8) 10%, transparent 60%),
+                        linear-gradient(to top, var(--bg) 0%, transparent 30%);
         }
 
         .slide-content {
-            position: absolute; bottom: 15%; left: 6%; z-index: 10; max-width: 600px;
+            position: absolute; bottom: 15%; left: 6%; z-index: 10; max-width: 450px;
         }
         .badge {
-            background: var(--accent); color: white; padding: 4px 12px; border-radius: 4px;
-            font-size: 12px; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; display: inline-block;
+            background: var(--accent); color: white; padding: 3px 10px; border-radius: 4px;
+            font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 12px; display: inline-block;
         }
-        .slide-content h1 { font-size: clamp(40px, 6vw, 70px); font-weight: 900; line-height: 1.1; margin-bottom: 15px; }
-        .slide-content p { color: var(--text-dim); font-size: 18px; margin-bottom: 30px; }
+        .slide-content h1 { font-size: clamp(26px, 4vw, 42px); font-weight: 900; line-height: 1.2; margin-bottom: 10px; color: #fff; }
+        .slide-content p { color: #ccc; font-size: 15px; margin-bottom: 25px; line-height: 1.5; opacity: 0.9; }
 
         .btn-watch-main {
-            background: var(--accent); color: #fff; padding: 15px 40px; border: none;
+            background: var(--accent); color: #fff; padding: 12px 30px; border: none;
             border-radius: 8px; font-weight: 800; cursor: pointer; display: flex; align-items: center;
-            gap: 15px; font-size: 18px; transition: 0.3s;
+            gap: 12px; font-size: 15px; transition: 0.3s;
         }
-        .btn-watch-main:hover { transform: translateY(-5px); box-shadow: 0 10px 20px var(--shadow); }
 
-        /* --- PLAYER MODAL (FULLSCREEN COMPATIBLE) --- */
+        /* --- PLAYER MODAL --- */
         .player-modal { position: fixed; inset: 0; background: #000; display: none; z-index: 3000; }
-        
-        /* Video takes full space */
-        #v-player { width: 100%; height: 100%; object-fit: contain; }
+        #v-player { width: 100%; height: 100%; }
 
-        /* UI elements that stay visible */
         .player-ui { 
             position: absolute; inset: 0; z-index: 3100; pointer-events: none; 
-            opacity: 0; transition: 0.4s; 
-            background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 20%, transparent 80%, rgba(0,0,0,0.7) 100%);
+            opacity: 0; transition: 0.4s; background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 20%, transparent 80%, rgba(0,0,0,0.8) 100%);
         }
         .player-ui.show { opacity: 1; }
 
         .player-top-bar {
             position: absolute; top: 0; width: 100%; padding: 25px 40px;
-            display: flex; justify-content: space-between; align-items: center;
-            pointer-events: auto;
+            display: flex; justify-content: space-between; align-items: center; pointer-events: auto;
         }
         .player-logo { font-size: 24px; font-weight: 900; color: #fff; }
-        .player-exit { font-size: 35px; color: #fff; cursor: pointer; transition: 0.3s; }
-        .player-exit:hover { color: var(--accent); transform: scale(1.2); }
+        .player-exit { font-size: 35px; color: #fff; cursor: pointer; }
 
         .player-settings-group {
-            position: absolute; bottom: 100px; right: 40px; pointer-events: auto;
-            display: flex; flex-direction: column; align-items: flex-end;
+            position: absolute; bottom: 100px; right: 40px; pointer-events: auto; display: flex; flex-direction: column; align-items: flex-end;
         }
-        .settings-btn {
-            width: 50px; height: 50px; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 22px; cursor: pointer; border: 1px solid rgba(255,255,255,0.2);
-        }
-        .settings-panel {
-            background: rgba(10, 10, 12, 0.95); border: 1px solid var(--border);
-            padding: 20px; border-radius: 15px; width: 240px; margin-bottom: 15px;
-            display: none; backdrop-filter: blur(15px);
-        }
+        .settings-btn { width: 45px; height: 45px; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); color: #fff; }
+        .settings-panel { background: rgba(10, 10, 12, 0.98); border: 1px solid #333; padding: 15px; border-radius: 12px; width: 220px; margin-bottom: 10px; display: none; }
         .settings-panel.open { display: block; }
-        .setting-row { margin-bottom: 15px; }
-        .setting-row label { display: block; font-size: 11px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 8px; font-weight: 700; }
-        .setting-row select { width: 100%; background: #1a1a1a; color: #fff; border: 1px solid #333; padding: 10px; border-radius: 8px; cursor: pointer; }
-
-        /* Custom Fullscreen Button inside UI */
-        .fs-toggle { margin-top: 10px; color: #aaa; font-size: 12px; cursor: pointer; }
+        .setting-row label { display: block; font-size: 10px; color: #aaa; text-transform: uppercase; margin-bottom: 5px; font-weight: 700; }
+        .setting-row select { width: 100%; background: #222; color: #fff; border: 1px solid #444; padding: 8px; border-radius: 6px; margin-bottom: 10px; }
 
         /* --- FILTERS & GRID --- */
-        .filter-container { padding: 40px 6% 0; display: flex; gap: 15px; overflow-x: auto; scrollbar-width: none; }
-        .filter-chip { padding: 12px 28px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 50px; cursor: pointer; transition: 0.3s; font-weight: 600; white-space: nowrap; }
-        .filter-chip.active { background: var(--accent); border-color: var(--accent); }
+        .filter-container { padding: 40px 6% 0; display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none; }
+        .filter-chip { padding: 10px 22px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 50px; cursor: pointer; transition: 0.3s; font-weight: 600; white-space: nowrap; color: var(--text); }
+        .filter-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 
         .container { padding: 30px 6% 100px; }
-        .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 30px; }
-        .movie-card { background: var(--card-bg); border-radius: 15px; overflow: hidden; border: 1px solid var(--border); transition: 0.4s; cursor: pointer; }
-        .movie-card:hover { transform: translateY(-10px); border-color: var(--accent); box-shadow: 0 15px 30px var(--shadow); }
+        .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 25px; }
+        .movie-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); transition: 0.3s; cursor: pointer; }
+        .movie-card:hover { transform: translateY(-8px); border-color: var(--accent); box-shadow: 0 10px 20px var(--shadow); }
         .movie-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
-        .card-info { padding: 18px; }
-        .quality-tag { background: var(--accent); color: #fff; font-size: 10px; font-weight: 900; padding: 3px 10px; border-radius: 4px; display: inline-block; margin-top: 10px; }
+        .card-info { padding: 15px; }
+        .card-info h4 { font-size: 14px; font-weight: 700; color: var(--text); }
+        .quality-tag { background: var(--accent); color: #fff; font-size: 9px; font-weight: 900; padding: 2px 8px; border-radius: 4px; display: inline-block; margin-top: 8px; }
 
         @media (max-width: 768px) {
-            .search-box { display: none; }
-            .slide-content h1 { font-size: 40px; }
-            .movie-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+            .search-box { width: 150px; }
+            .search-box:focus-within { width: 180px; }
+            .slide-content { bottom: 10%; }
+            .movie-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+            .player-top-bar { padding: 20px; }
         }
     </style>
 </head>
@@ -143,19 +138,17 @@
 
     <nav>
         <div class="nav-left">
-            <i class="fa-solid fa-bars-staggered" style="cursor:pointer; font-size:22px" onclick="toggleSidebar()"></i>
-            <div class="logo" onclick="location.reload()"><span class="red">STREAM</span><span>X</span></div>
+            <a href="#" class="logo" onclick="location.reload()"><span class="red">STREAM</span><span>X</span></a>
         </div>
-        <div class="nav-right">
+        <div class="nav-right" style="display:flex; gap:15px; align-items:center;">
             <div class="search-box">
                 <i class="fa fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Search for movies..." oninput="searchMovies()">
+                <input type="text" id="searchInput" placeholder="Search..." oninput="searchMovies()">
             </div>
             <button class="theme-btn" onclick="toggleTheme()" id="themeBtn"><i class="fa-solid fa-moon"></i></button>
         </div>
     </nav>
 
-    <!-- BANNER SLIDER -->
     <section class="slider-container">
         <div class="slider-wrapper" id="sliderWrapper"></div>
     </section>
@@ -164,7 +157,7 @@
         <div class="filter-chip active" onclick="filterData('All', this)">All Content</div>
     </div>
 
-    <div class="container">
+    <div class="container" id="mainContainer">
         <div class="movie-grid" id="movieGrid" data-aos="fade-up"></div>
     </div>
 
@@ -179,14 +172,14 @@
             <div class="player-settings-group">
                 <div class="settings-panel" id="settingsPanel">
                     <div class="setting-row">
-                        <label>Audio Language</label>
-                        <select id="audioSel" onchange="changeAudio()"><option>Loading...</option></select>
+                        <label>Audio</label>
+                        <select id="audioSel" onchange="changeAudio()"><option>Default</option></select>
                     </div>
                     <div class="setting-row">
-                        <label>Video Quality</label>
+                        <label>Quality</label>
                         <select id="qualitySel" onchange="changeQuality()"><option>Auto</option></select>
                     </div>
-                    <div class="fs-toggle" onclick="toggleFullScreen()"><i class="fa fa-expand"></i> Enter Fullscreen</div>
+                    <div style="color:#aaa; font-size:11px; cursor:pointer;" onclick="toggleFullScreen()"><i class="fa fa-expand"></i> Fullscreen</div>
                 </div>
                 <div class="settings-btn" onclick="toggleSettings()"><i class="fa fa-cog"></i></div>
             </div>
@@ -221,9 +214,9 @@
                     <img src="${m.logo}">
                     <div class="slide-overlay"></div>
                     <div class="slide-content">
-                        <span class="badge">Platinum Exclusive</span>
+                        <span class="badge">Trending Now</span>
                         <h1>${m.name}</h1>
-                        <p>Experience the latest blockbuster in stunning 4K quality. Now streaming exclusively on StreamX.</p>
+                        <p>Watch this exclusive blockbuster in ultra high definition. Experience cinema at home.</p>
                         <button class="btn-watch-main" onclick="openPlayer('${m.url}')">
                             <i class="fa fa-play"></i> WATCH NOW
                         </button>
@@ -234,6 +227,7 @@
         function startAutoSlide() {
             setInterval(() => {
                 const slides = document.querySelectorAll('.slide');
+                if(!slides.length) return;
                 slides[currentIndex].classList.remove('active');
                 currentIndex = (currentIndex + 1) % heroItems.length;
                 document.getElementById('sliderWrapper').style.transform = `translateX(-${currentIndex * 100}%)`;
@@ -246,10 +240,27 @@
                 <div class="movie-card" onclick="openPlayer('${m.url}')">
                     <img src="${m.logo}" loading="lazy">
                     <div class="card-info">
-                        <h4 style="font-weight:700">${m.name}</h4>
-                        <div class="quality-tag">${m.quality || 'Web-HQ'}</div>
+                        <h4>${m.name}</h4>
+                        <div class="quality-tag">${m.quality || 'WEB-HQ'}</div>
                     </div>
                 </div>`).join('');
+        }
+
+        function searchMovies() {
+            const term = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = gridItems.filter(m => m.name.toLowerCase().includes(term));
+            renderGrid(filtered);
+            if(term.length > 0) {
+                document.getElementById('filterWrapper').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const isDark = html.getAttribute('data-theme') === 'dark';
+            const nextTheme = isDark ? 'light' : 'dark';
+            html.setAttribute('data-theme', nextTheme);
+            document.getElementById('themeBtn').innerHTML = nextTheme === 'dark' ? '<i class="fa-solid fa-moon"></i>' : '<i class="fa-solid fa-sun"></i>';
         }
 
         function renderFilters() {
@@ -264,7 +275,7 @@
             renderGrid(cat === 'All' ? gridItems : gridItems.filter(m => m.cat === cat));
         }
 
-        // --- PLAYER LOGIC ---
+        // --- PLAYER ---
         const modal = document.getElementById('playerModal');
         const video = document.getElementById('v-player');
         const ui = document.getElementById('playerUI');
@@ -272,21 +283,13 @@
         function openPlayer(url) {
             modal.style.display = 'block';
             showUI();
-
             if (Hls.isSupported() && url.includes('.m3u8')) {
                 if(hls) hls.destroy();
                 hls = new Hls();
                 hls.loadSource(url);
                 hls.attachMedia(video);
-                
-                hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                    setupQuality();
-                    video.play();
-                });
-
-                hls.on(Hls.Events.AUDIO_TRACKS_UPDATED, () => {
-                    setupAudio();
-                });
+                hls.on(Hls.Events.MANIFEST_PARSED, () => { setupQuality(); video.play(); });
+                hls.on(Hls.Events.AUDIO_TRACKS_UPDATED, () => { setupAudio(); });
             } else {
                 video.src = url;
                 video.play();
@@ -295,10 +298,8 @@
 
         function setupQuality() {
             const qSel = document.getElementById('qualitySel');
-            qSel.innerHTML = '<option value="-1">Auto Quality</option>';
-            hls.levels.forEach((lvl, i) => {
-                qSel.innerHTML += `<option value="${i}">${lvl.height}p</option>`;
-            });
+            qSel.innerHTML = '<option value="-1">Auto</option>';
+            hls.levels.forEach((lvl, i) => { qSel.innerHTML += `<option value="${i}">${lvl.height}p</option>`; });
         }
 
         function setupAudio() {
@@ -306,15 +307,13 @@
             const tracks = hls.audioTracks;
             if(tracks.length > 0) {
                 aSel.innerHTML = tracks.map((t, i) => `<option value="${i}">${t.name || t.lang}</option>`).join('');
-            } else {
-                aSel.innerHTML = '<option>Default Audio</option>';
             }
         }
 
         function changeQuality() { hls.currentLevel = parseInt(document.getElementById('qualitySel').value); }
         function changeAudio() { hls.audioTrack = parseInt(document.getElementById('audioSel').value); }
         function toggleSettings() { document.getElementById('settingsPanel').classList.toggle('open'); }
-
+        
         function showUI() {
             ui.classList.add('show');
             clearTimeout(uiTimer);
@@ -326,11 +325,8 @@
         modal.addEventListener('mousemove', showUI);
 
         function toggleFullScreen() {
-            if (!document.fullscreenElement) {
-                modal.requestFullscreen().catch(err => alert("Error enabling fullscreen"));
-            } else {
-                document.exitFullscreen();
-            }
+            if (!document.fullscreenElement) modal.requestFullscreen();
+            else document.exitFullscreen();
         }
 
         function closePlayer() {
@@ -338,11 +334,6 @@
             if(hls) { hls.destroy(); hls = null; }
             if(document.fullscreenElement) document.exitFullscreen();
             modal.style.display = 'none';
-        }
-
-        function searchMovies() {
-            const term = document.getElementById('searchInput').value.toLowerCase();
-            renderGrid(gridItems.filter(m => m.name.toLowerCase().includes(term)));
         }
 
         init();
