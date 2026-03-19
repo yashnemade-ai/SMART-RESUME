@@ -60,52 +60,71 @@
         /* --- SOLID BLACK SIDEBAR --- */
         .sidebar {
             position: fixed; top: 0; left: -320px; width: 300px; height: 100%;
-            background: #000000 !important; /* Solid Black */
+            background: #000000 !important;
             z-index: 2000; border-right: 1px solid var(--border);
             padding: 40px 30px; transition: 0.5s;
         }
         .sidebar.open { left: 0; }
         .sidebar-close { position: absolute; top: 25px; right: 25px; font-size: 24px; cursor: pointer; color: #fff; }
-        .sidebar .logo { color: #fff; }
         .sidebar-contact { color: var(--accent) !important; font-weight: 900 !important; text-decoration: none; font-size: 16px; }
 
-        /* --- BANNER (FIT IMAGE & MINIMUM TINT) --- */
+        /* --- BANNER (SLIGHT ANIMATION) --- */
         .slider-container { width: 100%; height: 75vh; position: relative; overflow: hidden; background: #000; margin-top: 55px; }
         .slider-wrapper { display: flex; height: 100%; transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
-        .slide { min-width: 100%; height: 100%; position: relative; }
-        .slide img { width: 100%; height: 100%; object-fit: 100% 100%; } /* Proper Fit */
+        .slide { min-width: 100%; height: 100%; position: relative; overflow: hidden; }
+        
+        .slide img { 
+            width: 100%; height: 100%; 
+            object-fit: 100% 100%; 
+            transition: transform 10s linear; /* Very slow and subtle */
+        } 
+        /* Triggered when slide becomes active */
+        .slide.active img { transform: scale(1.05); } 
         
         .slide-overlay { 
             position: absolute; inset: 0; 
-            background: linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 40%); /* Minimum Tint */
+            background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 45%);
         }
 
         .slide-content { position: absolute; bottom: 12%; left: 6%; z-index: 10; max-width: 450px; }
         .badge { background: var(--accent); color: white; padding: 3px 10px; border-radius: 4px; font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 12px; display: inline-block; }
         .slide-content h1 { font-size: clamp(24px, 4vw, 38px); font-weight: 900; line-height: 1.2; margin-bottom: 10px; color: #fff; text-shadow: 2px 2px 10px rgba(0,0,0,0.8); }
         .slide-content p { color: #eee; font-size: 14px; margin-bottom: 20px; text-shadow: 1px 1px 5px rgba(0,0,0,0.8); }
-        .btn-watch-main { background: var(--accent); color: #fff; padding: 10px 25px; border: none; border-radius: 6px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 14px; }
+        .btn-watch-main { background: var(--accent); color: #fff; padding: 10px 25px; border: none; border-radius: 6px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 14px; transition: 0.3s; }
+        .btn-watch-main:hover { opacity: 0.9; transform: scale(1.05); }
 
-        /* --- MANUAL DOTS --- */
-        .slider-dots {
-            position: absolute; bottom: 20px; width: 100%;
-            display: flex; justify-content: center; gap: 8px; z-index: 20;
-        }
+        /* Manual Dots */
+        .slider-dots { position: absolute; bottom: 20px; width: 100%; display: flex; justify-content: center; gap: 8px; z-index: 20; }
         .dot { width: 10px; height: 10px; background: rgba(255,255,255,0.4); border-radius: 50%; cursor: pointer; transition: 0.3s; }
         .dot.active { background: var(--accent); width: 25px; border-radius: 10px; }
 
-        /* --- CARDS --- */
+        /* --- CARDS (RESTORED ANIMATION) --- */
         .filter-container { padding: 30px 6% 0; display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none; }
-        .filter-chip { padding: 10px 22px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 50px; cursor: pointer; font-weight: 600; white-space: nowrap; color: var(--text); }
+        .filter-chip { padding: 10px 22px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 50px; cursor: pointer; font-weight: 600; white-space: nowrap; color: var(--text); transition: 0.3s; }
         .filter-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 
         .container { padding: 20px 6% 100px; }
         .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; }
-        .movie-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); transition: 0.3s; cursor: pointer; }
+        
+        .movie-card { 
+            background: var(--card-bg); 
+            border-radius: 12px; 
+            overflow: hidden; 
+            border: 1px solid var(--border); 
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            cursor: pointer; 
+        }
+        /* Card Hover Animation Restored */
+        .movie-card:hover { 
+            transform: translateY(-12px); 
+            border-color: var(--accent); 
+            box-shadow: 0 15px 35px var(--shadow); 
+        }
+        
         .movie-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
         .card-info { padding: 12px; }
         .card-genre { font-size: 10px; color: var(--accent); font-weight: 800; text-transform: uppercase; margin-bottom: 5px; display: block; }
-        .card-info h4 { font-size: 14px; font-weight: 700; color: var(--text); }
+        .card-info h4 { font-size: 14px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .quality-tag { background: var(--accent); color: #fff; font-size: 9px; font-weight: 900; padding: 2px 8px; border-radius: 4px; display: inline-block; margin-top: 8px; }
 
         /* --- PLAYER --- */
@@ -142,20 +161,22 @@
         </div>
     </nav>
 
-    <!-- SOLID BLACK SIDEBAR -->
+    <!-- PROFESSIONAL SIDEBAR -->
     <div class="sidebar" id="sidebar">
         <i class="fa fa-times sidebar-close" onclick="toggleSidebar()"></i>
         <div class="logo" style="margin-bottom:40px"><span class="red">STREAM</span><span>X</span></div>
-        <div style="font-size:14px; color:#bbb; line-height:2">
-            <p style="color:#fff; font-weight:800; font-size:16px; margin-bottom:10px">StreamX Premium</p>
-            <p>Developed by Yash</p>
-            <p>Support: <a href="mailto:support@streamx.com" class="sidebar-contact">support@streamx.com</a></p>
-            <hr style="margin:20px 0; opacity:0.1">
-            <p>© 2026 All Rights Reserved.</p>
+        <div style="font-size:14px; color:#bbb; line-height:1.8">
+            <p style="color:#fff; font-weight:700; font-size:18px; margin-bottom:12px; text-transform: uppercase;">About</p>
+            <p>StreamX is a premium cinematic destination designed for high-quality content enthusiasts. We provide a seamless, buffer-free viewing experience.</p>
+            <br>
+            <p>Developed by: <b>Yash</b></p>
+            <p>Official Support: <a href="mailto:support@streamx.com" class="sidebar-contact">support@streamx.com</a></p>
+            <hr style="margin:25px 0; opacity:0.1; border-color:#fff">
+            <p style="font-size:12px; opacity:0.6">© 2026 STREAMX. All Rights Reserved.</p>
         </div>
     </div>
 
-    <!-- BANNER WITH DOTS -->
+    <!-- BANNER -->
     <section class="slider-container">
         <div class="slider-wrapper" id="sliderWrapper"></div>
         <div class="slider-dots" id="sliderDots"></div>
@@ -209,13 +230,13 @@
             const wrapper = document.getElementById('sliderWrapper');
             const dots = document.getElementById('sliderDots');
             wrapper.innerHTML = heroItems.map((m, i) => `
-                <div class="slide">
+                <div class="slide ${i === 0 ? 'active' : ''}">
                     <img src="${m.logo}">
                     <div class="slide-overlay"></div>
                     <div class="slide-content">
                         <span class="badge">Trending Now</span>
                         <h1>${m.name}</h1>
-                        <p>Watch this exclusive blockbuster on StreamX.</p>
+                        <p>Watch this exclusive blockbuster on StreamX. Platinum premium quality streaming.</p>
                         <button class="btn-watch-main" onclick="openPlayer('${m.url}')">
                             <i class="fa fa-play"></i> WATCH NOW
                         </button>
@@ -233,8 +254,12 @@
         function goToSlide(index) {
             currentIndex = index;
             document.getElementById('sliderWrapper').style.transform = `translateX(-${currentIndex * 100}%)`;
+            
             const dots = document.querySelectorAll('.dot');
+            const slides = document.querySelectorAll('.slide');
+            
             dots.forEach((d, i) => d.classList.toggle('active', i === currentIndex));
+            slides.forEach((s, i) => s.classList.toggle('active', i === currentIndex));
         }
 
         function startAutoSlide() {
@@ -259,7 +284,7 @@
         function searchMovies() {
             const term = document.getElementById('searchInput').value.toLowerCase();
             renderGrid(gridItems.filter(m => m.name.toLowerCase().includes(term)));
-            if(term.length > 0) document.getElementById('filterWrapper').scrollIntoView({ behavior: 'smooth' });
+            if(term.length > 0) document.getElementById('mainContainer').scrollIntoView({ behavior: 'smooth' });
         }
 
         function toggleTheme() {
@@ -270,11 +295,13 @@
         }
 
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+        
         function renderFilters() {
             const wrapper = document.getElementById('filterWrapper');
             const cats = [...new Set(gridItems.map(m => m.cat))];
             cats.forEach(c => wrapper.innerHTML += `<div class="filter-chip" onclick="filterData('${c}', this)">${c}</div>`);
         }
+        
         function filterData(cat, el) {
             document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
             el.classList.add('active');
