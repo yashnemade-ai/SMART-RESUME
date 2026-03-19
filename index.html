@@ -13,7 +13,7 @@
     <style>
         :root {
             --bg: #050505;
-            --nav-bg: rgba(0, 0, 0, 0.9);
+            --nav-bg: #000000;
             --card-bg: #0d0d0f;
             --text: #ffffff;
             --text-dim: #b3b3b3;
@@ -24,7 +24,7 @@
 
         [data-theme="light"] {
             --bg: #f5f5f7;
-            --nav-bg: rgba(255, 255, 255, 0.9);
+            --nav-bg: #ffffff;
             --card-bg: #ffffff;
             --text: #1d1d1f;
             --text-dim: #6e6e73;
@@ -41,7 +41,7 @@
             display: flex; justify-content: space-between; align-items: center;
             padding: 10px 6%; background: var(--nav-bg);
             position: fixed; width: 100%; top: 0; z-index: 1000;
-            border-bottom: 1px solid var(--border); backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--border);
         }
         .nav-left { display: flex; align-items: center; gap: 20px; }
         .logo { font-size: 26px; font-weight: 900; cursor: pointer; color: var(--text); text-decoration: none; }
@@ -52,66 +52,76 @@
             padding: 8px 18px; border-radius: 50px; display: flex; align-items: center;
             transition: 0.4s; width: 200px;
         }
-        .search-box:focus-within { width: 300px; border-color: var(--accent); background: rgba(120, 120, 120, 0.15); }
+        .search-box:focus-within { width: 300px; border-color: var(--accent); }
         .search-box input { background: transparent; border: none; color: var(--text); outline: none; width: 100%; margin-left: 10px; }
 
-        .theme-btn { background: none; border: none; color: var(--text); font-size: 20px; cursor: pointer; padding: 5px; }
+        .theme-btn { background: none; border: none; color: var(--text); font-size: 20px; cursor: pointer; }
 
-        /* --- SIDEBAR --- */
+        /* --- SOLID BLACK SIDEBAR --- */
         .sidebar {
             position: fixed; top: 0; left: -320px; width: 300px; height: 100%;
-            background: var(--nav-bg); z-index: 2000; border-right: 1px solid var(--border);
-            padding: 40px 30px; transition: 0.5s; backdrop-filter: blur(20px);
+            background: #000000 !important; /* Solid Black */
+            z-index: 2000; border-right: 1px solid var(--border);
+            padding: 40px 30px; transition: 0.5s;
         }
         .sidebar.open { left: 0; }
-        .sidebar-close { position: absolute; top: 25px; right: 25px; font-size: 24px; cursor: pointer; }
+        .sidebar-close { position: absolute; top: 25px; right: 25px; font-size: 24px; cursor: pointer; color: #fff; }
+        .sidebar .logo { color: #fff; }
+        .sidebar-contact { color: var(--accent) !important; font-weight: 900 !important; text-decoration: none; font-size: 16px; }
 
-        /* --- BANNER --- */
-        .slider-container { width: 100%; height: 80vh; position: relative; overflow: hidden; background: #000; }
+        /* --- BANNER (FIT IMAGE & MINIMUM TINT) --- */
+        .slider-container { width: 100%; height: 75vh; position: relative; overflow: hidden; background: #000; margin-top: 55px; }
         .slider-wrapper { display: flex; height: 100%; transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
         .slide { min-width: 100%; height: 100%; position: relative; }
-        .slide img { width: 100%; height: 100%; object-fit: cover; transition: 6s ease-in-out; }
-        .slide.active img { transform: scale(1.08); }
-        .slide-overlay { position: absolute; inset: 0; background: linear-gradient(to right, rgba(0,0,0,0.8) 10%, transparent 60%), linear-gradient(to top, var(--bg) 0%, transparent 30%); }
-        .slide-content { position: absolute; bottom: 15%; left: 6%; z-index: 10; max-width: 450px; }
-        .badge { background: var(--accent); color: white; padding: 3px 10px; border-radius: 4px; font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 12px; display: inline-block; }
-        .slide-content h1 { font-size: clamp(26px, 4vw, 42px); font-weight: 900; line-height: 1.2; margin-bottom: 10px; color: #fff; }
-        .slide-content p { color: #ccc; font-size: 15px; margin-bottom: 25px; line-height: 1.5; opacity: 0.9; }
-        .btn-watch-main { background: var(--accent); color: #fff; padding: 12px 30px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 12px; font-size: 15px; transition: 0.3s; }
+        .slide img { width: 100%; height: 100%; object-fit: 100% 100%; } /* Proper Fit */
+        
+        .slide-overlay { 
+            position: absolute; inset: 0; 
+            background: linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 40%); /* Minimum Tint */
+        }
 
-        /* --- CARDS & GRID --- */
-        .filter-container { padding: 40px 6% 0; display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none; }
-        .filter-chip { padding: 10px 22px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 50px; cursor: pointer; transition: 0.3s; font-weight: 600; white-space: nowrap; color: var(--text); }
+        .slide-content { position: absolute; bottom: 12%; left: 6%; z-index: 10; max-width: 450px; }
+        .badge { background: var(--accent); color: white; padding: 3px 10px; border-radius: 4px; font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 12px; display: inline-block; }
+        .slide-content h1 { font-size: clamp(24px, 4vw, 38px); font-weight: 900; line-height: 1.2; margin-bottom: 10px; color: #fff; text-shadow: 2px 2px 10px rgba(0,0,0,0.8); }
+        .slide-content p { color: #eee; font-size: 14px; margin-bottom: 20px; text-shadow: 1px 1px 5px rgba(0,0,0,0.8); }
+        .btn-watch-main { background: var(--accent); color: #fff; padding: 10px 25px; border: none; border-radius: 6px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 14px; }
+
+        /* --- MANUAL DOTS --- */
+        .slider-dots {
+            position: absolute; bottom: 20px; width: 100%;
+            display: flex; justify-content: center; gap: 8px; z-index: 20;
+        }
+        .dot { width: 10px; height: 10px; background: rgba(255,255,255,0.4); border-radius: 50%; cursor: pointer; transition: 0.3s; }
+        .dot.active { background: var(--accent); width: 25px; border-radius: 10px; }
+
+        /* --- CARDS --- */
+        .filter-container { padding: 30px 6% 0; display: flex; gap: 12px; overflow-x: auto; scrollbar-width: none; }
+        .filter-chip { padding: 10px 22px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 50px; cursor: pointer; font-weight: 600; white-space: nowrap; color: var(--text); }
         .filter-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 
-        .container { padding: 30px 6% 100px; }
-        .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 25px; }
+        .container { padding: 20px 6% 100px; }
+        .movie-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; }
         .movie-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); transition: 0.3s; cursor: pointer; }
-        .movie-card:hover { transform: translateY(-8px); border-color: var(--accent); box-shadow: 0 10px 20px var(--shadow); }
         .movie-card img { width: 100%; aspect-ratio: 2/3; object-fit: cover; }
-        .card-info { padding: 15px; }
-        
-        /* RESTORED CATEGORY STYLE */
+        .card-info { padding: 12px; }
         .card-genre { font-size: 10px; color: var(--accent); font-weight: 800; text-transform: uppercase; margin-bottom: 5px; display: block; }
-        .card-info h4 { font-size: 14px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card-info h4 { font-size: 14px; font-weight: 700; color: var(--text); }
         .quality-tag { background: var(--accent); color: #fff; font-size: 9px; font-weight: 900; padding: 2px 8px; border-radius: 4px; display: inline-block; margin-top: 8px; }
 
-        /* --- PLAYER MODAL --- */
+        /* --- PLAYER --- */
         .player-modal { position: fixed; inset: 0; background: #000; display: none; z-index: 3000; }
         #v-player { width: 100%; height: 100%; }
-        .player-ui { position: absolute; inset: 0; z-index: 3100; pointer-events: none; opacity: 0; transition: 0.4s; background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 20%, transparent 80%, rgba(0,0,0,0.8) 100%); }
-        .player-ui.show { opacity: 1; }
-        .player-top-bar { position: absolute; top: 0; width: 100%; padding: 25px 40px; display: flex; justify-content: space-between; align-items: center; pointer-events: auto; }
-        .player-logo { font-size: 24px; font-weight: 900; color: #fff; }
+        .player-top-bar { position: absolute; top: 0; width: 100%; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; z-index: 3100; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); }
         .player-exit { font-size: 35px; color: #fff; cursor: pointer; }
-        .player-settings-group { position: absolute; bottom: 100px; right: 40px; pointer-events: auto; display: flex; flex-direction: column; align-items: flex-end; }
-        .settings-btn { width: 45px; height: 45px; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); color: #fff; }
-        .settings-panel { background: rgba(10, 10, 12, 0.98); border: 1px solid #333; padding: 15px; border-radius: 12px; width: 220px; margin-bottom: 10px; display: none; }
+        .player-settings-group { position: absolute; bottom: 80px; right: 30px; z-index: 3100; display: flex; flex-direction: column; align-items: flex-end; }
+        .settings-btn { width: 45px; height: 45px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color:#fff; }
+        .settings-panel { background: #111; border: 1px solid #333; padding: 15px; border-radius: 10px; width: 200px; margin-bottom: 10px; display: none; }
         .settings-panel.open { display: block; }
-        .setting-row select { width: 100%; background: #222; color: #fff; border: 1px solid #444; padding: 8px; border-radius: 6px; margin-bottom: 10px; }
+        .setting-row select { width: 100%; background: #222; color: #fff; border: 1px solid #444; padding: 8px; border-radius: 5px; margin-bottom: 10px; }
 
         @media (max-width: 768px) {
             .search-box { display: none; }
+            .slider-container { height: 45vh; }
             .movie-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
         }
     </style>
@@ -132,21 +142,23 @@
         </div>
     </nav>
 
-    <!-- RESTORED SIDEBAR -->
+    <!-- SOLID BLACK SIDEBAR -->
     <div class="sidebar" id="sidebar">
         <i class="fa fa-times sidebar-close" onclick="toggleSidebar()"></i>
         <div class="logo" style="margin-bottom:40px"><span class="red">STREAM</span><span>X</span></div>
-        <div style="font-size:14px; color:var(--text-dim); line-height:2">
-            <p style="color:var(--text); font-weight:800; font-size:16px; margin-bottom:10px">StreamX Premium</p>
+        <div style="font-size:14px; color:#bbb; line-height:2">
+            <p style="color:#fff; font-weight:800; font-size:16px; margin-bottom:10px">StreamX Premium</p>
             <p>Developed by Yash</p>
-            <p>Contact: <a href="mailto:support@streamx.com" style="color:var(--accent); text-decoration:none;">support@streamx.com</a></p>
+            <p>Support: <a href="mailto:support@streamx.com" class="sidebar-contact">support@streamx.com</a></p>
             <hr style="margin:20px 0; opacity:0.1">
             <p>© 2026 All Rights Reserved.</p>
         </div>
     </div>
 
+    <!-- BANNER WITH DOTS -->
     <section class="slider-container">
         <div class="slider-wrapper" id="sliderWrapper"></div>
+        <div class="slider-dots" id="sliderDots"></div>
     </section>
 
     <div class="filter-container" id="filterWrapper">
@@ -157,20 +169,18 @@
         <div class="movie-grid" id="movieGrid" data-aos="fade-up"></div>
     </div>
 
+    <!-- PLAYER -->
     <div class="player-modal" id="playerModal">
-        <div class="player-ui" id="playerUI">
-            <div class="player-top-bar">
-                <div class="player-logo">STREAM<span style="color:var(--accent)">X</span></div>
-                <div class="player-exit" onclick="closePlayer()">&times;</div>
+        <div class="player-top-bar">
+            <div style="font-size:24px; font-weight:900; color:#fff;">STREAM<span style="color:var(--accent)">X</span></div>
+            <div class="player-exit" onclick="closePlayer()">&times;</div>
+        </div>
+        <div class="player-settings-group">
+            <div class="settings-panel" id="settingsPanel">
+                <div class="setting-row"><label style="font-size:10px; color:#aaa;">AUDIO</label><select id="audioSel" onchange="changeAudio()"></select></div>
+                <div class="setting-row"><label style="font-size:10px; color:#aaa;">QUALITY</label><select id="qualitySel" onchange="changeQuality()"></select></div>
             </div>
-            <div class="player-settings-group">
-                <div class="settings-panel" id="settingsPanel">
-                    <div class="setting-row"><label style="font-size:10px; color:#aaa; text-transform:uppercase;">Audio</label><select id="audioSel" onchange="changeAudio()"></select></div>
-                    <div class="setting-row"><label style="font-size:10px; color:#aaa; text-transform:uppercase;">Quality</label><select id="qualitySel" onchange="changeQuality()"></select></div>
-                    <div style="color:#aaa; font-size:11px; cursor:pointer;" onclick="toggleFullScreen()"><i class="fa fa-expand"></i> Fullscreen</div>
-                </div>
-                <div class="settings-btn" onclick="toggleSettings()"><i class="fa fa-cog"></i></div>
-            </div>
+            <div class="settings-btn" onclick="toggleSettings()"><i class="fa fa-cog"></i></div>
         </div>
         <video id="v-player" crossorigin="anonymous" playsinline controls></video>
     </div>
@@ -180,7 +190,7 @@
         AOS.init({ duration: 800 });
         let allMovies = [], heroItems = [], gridItems = [], currentIndex = 0;
         let hls = null;
-        let uiTimer;
+        let slideInterval;
 
         async function init() {
             try {
@@ -197,33 +207,43 @@
 
         function renderSlider() {
             const wrapper = document.getElementById('sliderWrapper');
+            const dots = document.getElementById('sliderDots');
             wrapper.innerHTML = heroItems.map((m, i) => `
-                <div class="slide ${i===0?'active':''}">
+                <div class="slide">
                     <img src="${m.logo}">
                     <div class="slide-overlay"></div>
                     <div class="slide-content">
                         <span class="badge">Trending Now</span>
                         <h1>${m.name}</h1>
-                        <p>Watch this exclusive blockbuster in ultra high definition. Experience cinema at home.</p>
+                        <p>Watch this exclusive blockbuster on StreamX.</p>
                         <button class="btn-watch-main" onclick="openPlayer('${m.url}')">
                             <i class="fa fa-play"></i> WATCH NOW
                         </button>
                     </div>
                 </div>`).join('');
+            dots.innerHTML = heroItems.map((_, i) => `<div class="dot ${i===0?'active':''}" onclick="manualSlide(${i})"></div>`).join('');
+        }
+
+        function manualSlide(index) {
+            clearInterval(slideInterval);
+            goToSlide(index);
+            startAutoSlide();
+        }
+
+        function goToSlide(index) {
+            currentIndex = index;
+            document.getElementById('sliderWrapper').style.transform = `translateX(-${currentIndex * 100}%)`;
+            const dots = document.querySelectorAll('.dot');
+            dots.forEach((d, i) => d.classList.toggle('active', i === currentIndex));
         }
 
         function startAutoSlide() {
-            setInterval(() => {
-                const slides = document.querySelectorAll('.slide');
-                if(!slides.length) return;
-                slides[currentIndex].classList.remove('active');
+            slideInterval = setInterval(() => {
                 currentIndex = (currentIndex + 1) % heroItems.length;
-                document.getElementById('sliderWrapper').style.transform = `translateX(-${currentIndex * 100}%)`;
-                slides[currentIndex].classList.add('active');
+                goToSlide(currentIndex);
             }, 6000);
         }
 
-        // --- RESTORED CATEGORY IN CARDS ---
         function renderGrid(data) {
             document.getElementById('movieGrid').innerHTML = data.map(m => `
                 <div class="movie-card" onclick="openPlayer('${m.url}')">
@@ -264,11 +284,9 @@
         // --- PLAYER ---
         const modal = document.getElementById('playerModal');
         const video = document.getElementById('v-player');
-        const ui = document.getElementById('playerUI');
 
         function openPlayer(url) {
             modal.style.display = 'block';
-            showUI();
             if (Hls.isSupported() && url.includes('.m3u8')) {
                 if(hls) hls.destroy();
                 hls = new Hls();
@@ -290,10 +308,7 @@
         function changeQuality() { hls.currentLevel = parseInt(document.getElementById('qualitySel').value); }
         function changeAudio() { hls.audioTrack = parseInt(document.getElementById('audioSel').value); }
         function toggleSettings() { document.getElementById('settingsPanel').classList.toggle('open'); }
-        function showUI() { ui.classList.add('show'); clearTimeout(uiTimer); uiTimer = setTimeout(() => { if(!document.getElementById('settingsPanel').classList.contains('open')) ui.classList.remove('show'); }, 3000); }
-        modal.addEventListener('mousemove', showUI);
-        function toggleFullScreen() { if (!document.fullscreenElement) modal.requestFullscreen(); else document.exitFullscreen(); }
-        function closePlayer() { video.pause(); if(hls) { hls.destroy(); hls = null; } if(document.fullscreenElement) document.exitFullscreen(); modal.style.display = 'none'; }
+        function closePlayer() { video.pause(); if(hls) { hls.destroy(); hls = null; } modal.style.display = 'none'; }
 
         init();
     </script>
