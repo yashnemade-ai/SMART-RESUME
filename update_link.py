@@ -3,7 +3,7 @@ import re
 
 # --- कॉन्फ़िगरेशन (यहाँ अपनी ज़रूरत के हिसाब से बदलें) ---
 M3U_URL = "https://raw.githubusercontent.com/Sflex0719/ZioGarmTara/main/ZioGarmTara.m3u"
-NPOINT_URL = "https://api.npoint.io/85fbd5b6462f28618069"
+NPOINT_URL = "https://api.npoint.io/c0aa4f57f93105ce45de"
 CHANNEL_NAME = "Star Plus"  # उस चैनल का नाम लिखें जिसका लिंक आप बदलना चाहते हैं
 # -------------------------------------------------------
 
