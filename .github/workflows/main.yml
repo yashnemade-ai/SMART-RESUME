@@ -1,0 +1,24 @@
+name: Auto Update npoint
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # यह हर घंटे अपने आप चलेगा
+  workflow_dispatch:      # इससे आप बटन दबाकर कभी भी चला सकते हैं
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run updater script
+        run: python update_link.py
