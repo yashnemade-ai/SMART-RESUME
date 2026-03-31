@@ -1,51 +1,62 @@
 import requests
-import re
 
-# --- कॉन्फ़िगरेशन (यहाँ अपनी ज़रूरत के हिसाब से बदलें) ---
+# --- सेटिंग्स ---
 M3U_URL = "https://raw.githubusercontent.com/Sflex0719/ZioGarmTara/main/ZioGarmTara.m3u"
 NPOINT_URL = "https://api.npoint.io/c0aa4f57f93105ce45de"
-CHANNEL_NAME = "Star Plus"  # उस चैनल का नाम लिखें जिसका लिंक आप बदलना चाहते हैं
-# -------------------------------------------------------
 
-def get_link_from_m3u():
+def get_m3u_links():
+    """M3U से सभी चैनल्स के नाम और लिंक निकालता है"""
     try:
         response = requests.get(M3U_URL)
-        content = response.text
-        lines = content.splitlines()
-        
+        lines = response.text.splitlines()
+        m3u_map = {}
         for i, line in enumerate(lines):
-            if CHANNEL_NAME in line:
-                # चैनल के नाम के ठीक नीचे वाली लाइन लिंक होती है
-                return lines[i+1].strip()
-        return None
-    except Exception as e:
-        print(f"Error fetching M3U: {e}")
-        return None
+            if line.startswith("#EXTINF"):
+                name = line.split(",")[-1].strip() # नाम निकालता है
+                link = lines[i+1].strip() # अगली लाइन का लिंक निकालता है
+                m3u_map[name] = link
+        return m3u_map
+    except:
+        return {}
 
-def update_npoint(new_link):
-    try:
-        # 1. पुराना डेटा डाउनलोड करें
-        current_data = requests.get(NPOINT_URL).json()
+def update_process():
+    # 1. ताज़ा लिंक्स लोड करें
+    m3u_data = get_m3u_links()
+    
+    # 2. npoint से अपना JSON मंगवाएं
+    response = requests.get(NPOINT_URL)
+    json_list = response.json()
+
+    updated = False
+    
+    # 3. लिस्ट में हर चैनल चेक करें
+    for channel in json_list:
+        current_url = channel.get("url", "")
         
-        # 2. डेटा अपडेट करें 
-        # (ध्यान दें: 'url' की जगह वो नाम लिखें जो आपके JSON में है)
-        current_data['url'] = new_link 
-        
-        # 3. वापस npoint पर अपलोड करें
-        response = requests.post(NPOINT_URL, json=current_data)
-        
-        if response.status_code == 200:
-            print(f"Success! {CHANNEL_NAME} updated with new link.")
-        else:
-            print(f"Failed to update npoint. Status: {response.status_code}")
+        # अगर लिंक के आखिर में # लगा है
+        if current_url.endswith("#"):
+            channel_name = channel.get("name") # JSON में जो नाम है
             
-    except Exception as e:
-        print(f"Error updating npoint: {e}")
+            # M3U में उस नाम का लिंक ढूंढें
+            # ध्यान दें: JSON का "name" और M3U का "name" एक जैसा होना चाहिए
+            if channel_name in m3u_data:
+                new_link = m3u_data[channel_name]
+                
+                # नया लिंक डालो और आखिर में फिर से # लगा दो (अगली बार के लिए)
+                channel["url"] = new_link + "#"
+                updated = True
+                print(f"Updated: {channel_name}")
+            else:
+                # अगर नाम थोड़ा अलग है (जैसे M3U में 'Star Plus' और JSON में 'Star Plus HD')
+                # तो यहाँ मैन्युअल चेक भी डाल सकते हैं
+                print(f"Not found in M3U: {channel_name}")
+
+    # 4. अगर बदलाव हुए हैं तो सेव करें
+    if updated:
+        requests.post(NPOINT_URL, json=json_list)
+        print("npoint.io successfully updated!")
+    else:
+        print("No links found with # marker.")
 
 if __name__ == "__main__":
-    link = get_link_from_m3u()
-    if link:
-        print(f"Found new link: {link}")
-        update_npoint(link)
-    else:
-        print("Channel not found in M3U file.")
+    update_process()
