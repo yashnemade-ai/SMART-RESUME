@@ -10,16 +10,21 @@ import os
 
 app = Flask(__name__)
 
-# NLTK setup
-nltk.download('stopwords')
-nltk.download('wordnet')
+# NLTK Setup - Ek baar download ka dhyan rakhein
+nltk.download('stopwords', quiet=True)
+nltk.download('wordnet', quiet=True)
+nltk.download('omw-1.4', quiet=True)
+
 stop_words = set(stopwords.words("english"))
 lemmatizer = WordNetLemmatizer()
 
 def clean_text(text):
-    text = str(text).lower()
+    if not isinstance(text, str):
+        return ""
+    text = text.lower()
     text = re.sub(r'[^a-z]', ' ', text)
     words = text.split()
+    # List comprehension is faster and saves memory
     return " ".join([lemmatizer.lemmatize(w) for w in words if w not in stop_words])
 
 @app.route('/')
@@ -38,34 +43,33 @@ def predict():
         return jsonify({"error": "Missing file or job description"}), 400
 
     try:
-        # User ki uploaded CSV load karna
-        df = pd.read_csv(file, on_bad_lines='skip', encoding='latin1')
+        # Optimization 1: RAM bachane ke liye sirf pehle 1000 rows read karein
+        # Agar aapki CSV bahut badi hai toh ye zaroori hai
+        df = pd.read_csv(file, on_bad_lines='skip', encoding='latin1').head(1000)
         
-        # Column detect karna (Resume_str ya Resume)
         possible_cols = ['Resume_str', 'Resume', 'resume_text', 'Resume_Text']
         res_col = next((c for c in possible_cols if c in df.columns), None)
         
         if not res_col:
-            return jsonify({"error": f"CSV must have one of these columns: {possible_cols}"}), 400
+            return jsonify({"error": "CSV columns mismatch. Use 'Resume_str' or 'Resume'"}), 400
 
         df = df.dropna(subset=[res_col])
         
-        # NLP Processing
-        df['cleaned'] = df[res_col].apply(clean_text)
-        tfidf = TfidfVectorizer(max_features=2000, ngram_range=(1,2))
-        tfidf_matrix = tfidf.fit_transform(df['cleaned'])
+        # Optimization 2: Clean text ko directly vectorizer mein daalein
+        # Bina naya column 'cleaned' banaye, memory bachti hai
+        cleaned_resumes = [clean_text(r) for r in df[res_col]]
         
-        # Job Matching
+        # Optimization 3: max_features ko 1000-1500 tak rakhein Render ke liye
+        tfidf = TfidfVectorizer(max_features=1500, ngram_range=(1,2))
+        tfidf_matrix = tfidf.fit_transform(cleaned_resumes)
+        
         job_clean = clean_text(job_desc)
         job_vec = tfidf.transform([job_clean])
         scores = cosine_similarity(tfidf_matrix, job_vec).flatten()
         
         df['Match_Score'] = (scores * 100).round(2)
-        
-        # Ranking Logic
         top_matches = df.sort_values(by='Match_Score', ascending=False).head(15)
         
-        # Agar 'Category' column hai toh wo bhi bhejenge
         cat_col = 'Category' if 'Category' in df.columns else None
         
         results = []
@@ -73,9 +77,12 @@ def predict():
             results.append({
                 "rank": i,
                 "category": getattr(row, cat_col) if cat_col else f"Candidate {row.Index}",
-                "score": row.Match_Score
+                "score": float(row.Match_Score) # JSON ke liye float convert karein
             })
 
+        # Memory cleanup
+        del df, tfidf_matrix, cleaned_resumes
+        
         return jsonify({"results": results})
 
     except Exception as e:
