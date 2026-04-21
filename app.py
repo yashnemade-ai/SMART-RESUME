@@ -1,102 +1,86 @@
-import streamlit as st
+from flask import Flask, render_template, request, jsonify
 import pandas as pd
-import numpy as np
 import re
-import matplotlib.pyplot as plt
-import seaborn as sns
 import nltk
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+import os
 
-# --- Page Config ---
-st.set_page_config(page_title="AI Resume Screener", page_icon="🎯", layout="wide")
+app = Flask(__name__)
 
-# --- NLTK Setup ---
-@st.cache_resource
-def download_nltk():
-    nltk.download('stopwords')
-    nltk.download('wordnet')
-
-download_nltk()
+# NLTK setup
+nltk.download('stopwords')
+nltk.download('wordnet')
+stop_words = set(stopwords.words("english"))
+lemmatizer = WordNetLemmatizer()
 
 def clean_text(text):
-    if not isinstance(text, str): return ""
-    text = text.lower()
-    text = re.sub(r'http\S+\s*', ' ', text)
-    text = re.sub(r'[^a-zA-Z]', ' ', text)
-    text = re.sub(r'\s+', ' ', text).strip()
-    stop_words = set(stopwords.words("english"))
-    lemmatizer = WordNetLemmatizer()
-    return " ".join([lemmatizer.lemmatize(w) for w in text.split() if w not in stop_words])
+    text = str(text).lower()
+    text = re.sub(r'[^a-z]', ' ', text)
+    words = text.split()
+    return " ".join([lemmatizer.lemmatize(w) for w in words if w not in stop_words])
 
-# --- Sidebar UI ---
-st.sidebar.image("https://cdn-icons-png.flaticon.com/512/942/942799.png", width=100)
-st.sidebar.title("AI Recruiter Control")
-st.sidebar.info("Upload your resume database and find the best candidates using AI.")
+@app.route('/')
+def home():
+    return render_template('index.html')
 
-# --- Main UI ---
-st.title("🎯 Smart Resume Screening & Job Matching")
-st.markdown("### Powered by Advanced Big Data Analytics")
-
-uploaded_file = st.sidebar.file_uploader("Upload Resume Dataset (CSV)", type=["csv"])
-job_description = st.text_area("📋 Paste Job Description Here:", height=150, placeholder="e.g. Looking for a Data Scientist with Python and ML skills...")
-
-if uploaded_file and job_description:
-    # Processing Data
-    df = pd.read_csv(uploaded_file, on_bad_lines='skip', encoding='latin1')
-    df.dropna(subset=['Resume_str', 'Category'], inplace=True)
+@app.route('/predict', methods=['POST'])
+def predict():
+    if 'file' not in request.files:
+        return jsonify({"error": "No file uploaded"}), 400
     
-    with st.status("AI Engine at work...", expanded=True) as status:
-        st.write("Cleaning resumes...")
-        df['cleaned'] = df['Resume_str'].apply(clean_text)
+    file = request.files['file']
+    job_desc = request.form.get('job_description', '')
+
+    if file.filename == '' or not job_desc:
+        return jsonify({"error": "Missing file or job description"}), 400
+
+    try:
+        # User ki uploaded CSV load karna
+        df = pd.read_csv(file, on_bad_lines='skip', encoding='latin1')
         
-        st.write("Extracting features (TF-IDF)...")
-        tfidf = TfidfVectorizer(max_features=2500, ngram_range=(1,2))
-        X = tfidf.fit_transform(df['cleaned'])
+        # Column detect karna (Resume_str ya Resume)
+        possible_cols = ['Resume_str', 'Resume', 'resume_text', 'Resume_Text']
+        res_col = next((c for c in possible_cols if c in df.columns), None)
         
-        st.write("Calculating similarity scores...")
-        job_vec = tfidf.transform([clean_text(job_description)])
-        scores = cosine_similarity(X, job_vec).flatten()
+        if not res_col:
+            return jsonify({"error": f"CSV must have one of these columns: {possible_cols}"}), 400
+
+        df = df.dropna(subset=[res_col])
+        
+        # NLP Processing
+        df['cleaned'] = df[res_col].apply(clean_text)
+        tfidf = TfidfVectorizer(max_features=2000, ngram_range=(1,2))
+        tfidf_matrix = tfidf.fit_transform(df['cleaned'])
+        
+        # Job Matching
+        job_clean = clean_text(job_desc)
+        job_vec = tfidf.transform([job_clean])
+        scores = cosine_similarity(tfidf_matrix, job_vec).flatten()
+        
         df['Match_Score'] = (scores * 100).round(2)
-        status.update(label="Analysis Complete!", state="complete", expanded=False)
-
-    # Filter top candidates
-    matches = df[df['Match_Score'] >= 15].sort_values(by='Match_Score', ascending=False)
-
-    # --- Dashboard Layout ---
-    tab1, tab2, tab3 = st.tabs(["🏆 Top Candidates", "📊 Analytics", "📄 Raw Data"])
-
-    with tab1:
-        st.subheader("Top Recommended Profiles")
-        if not matches.empty:
-            # Displaying a clean table
-            st.dataframe(
-                matches[['Category', 'Match_Score']].head(10).style.background_gradient(cmap='Greens'),
-                use_container_width=True
-            )
-        else:
-            st.error("No resumes match the required skills (Threshold < 15%)")
-
-    with tab2:
-        col1, col2 = st.columns(2)
-        with col1:
-            st.write("#### Match Strength Distribution")
-            fig, ax = plt.subplots()
-            sns.barplot(x=matches['Match_Score'].head(10), y=[f"C-{i+1}" for i in range(min(10, len(matches)))], palette="rocket", ax=ax)
-            st.pyplot(fig)
         
-        with col2:
-            st.write("#### Top Matched Sectors")
-            fig2, ax2 = plt.subplots()
-            matches['Category'].value_counts().head(5).plot.pie(autopct='%1.1f%%', ax=ax2, colors=sns.color_palette("Set2"))
-            st.pyplot(fig2)
+        # Ranking Logic
+        top_matches = df.sort_values(by='Match_Score', ascending=False).head(15)
+        
+        # Agar 'Category' column hai toh wo bhi bhejenge
+        cat_col = 'Category' if 'Category' in df.columns else None
+        
+        results = []
+        for i, row in enumerate(top_matches.itertuples(), 1):
+            results.append({
+                "rank": i,
+                "category": getattr(row, cat_col) if cat_col else f"Candidate {row.Index}",
+                "score": row.Match_Score
+            })
 
-    with tab3:
-        st.write("Full Processed Dataset View")
-        st.dataframe(df[['Category', 'Resume_str', 'Match_Score']])
+        return jsonify({"results": results})
 
-else:
-    st.warning("👈 Please upload a CSV file and enter a job description in the sidebar.")
-    st.image("https://raw.githubusercontent.com/andymeneely/git-data-science/master/images/ds-workflow.png", use_column_width=True)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
