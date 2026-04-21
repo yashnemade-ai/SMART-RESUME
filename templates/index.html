@@ -493,9 +493,9 @@ body {
 
             results.forEach((res, i) => {
                 let rankIcon = '';
-                if(res.rank === 1) rankIcon = '<i class="fas fa-crown rank-1 mr-2 text-2xl"></i>';
-                else if(res.rank === 2) rankIcon = '<i class="fas fa-medal rank-2 mr-2 text-2xl"></i>';
-                else if(res.rank === 3) rankIcon = '<i class="fas fa-award rank-3 mr-2 text-2xl"></i>';
+                if(res.rank === 1) rankIcon = '<i class="fas fa-crown text-yellow-400 mr-2 text-2xl"></i>';
+                else if(res.rank === 2) rankIcon = '<i class="fas fa-medal text-gray-300 mr-2 text-2xl"></i>';
+                else if(res.rank === 3) rankIcon = '<i class="fas fa-award text-[#cd7f32] mr-2 text-2xl"></i>';
                 else rankIcon = `<span class="opacity-20 font-black">#${res.rank}</span>`;
 
                 table.innerHTML += `
