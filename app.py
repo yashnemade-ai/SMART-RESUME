@@ -10,22 +10,15 @@ import os
 
 app = Flask(__name__)
 
-# NLTK Setup - Ek baar download ka dhyan rakhein
 nltk.download('stopwords', quiet=True)
 nltk.download('wordnet', quiet=True)
-nltk.download('omw-1.4', quiet=True)
-
 stop_words = set(stopwords.words("english"))
 lemmatizer = WordNetLemmatizer()
 
-def clean_text(text):
-    if not isinstance(text, str):
-        return ""
-    text = text.lower()
+def clean_data(text):
+    text = str(text).lower()
     text = re.sub(r'[^a-z]', ' ', text)
-    words = text.split()
-    # List comprehension is faster and saves memory
-    return " ".join([lemmatizer.lemmatize(w) for w in words if w not in stop_words])
+    return " ".join([lemmatizer.lemmatize(w) for w in text.split() if w not in stop_words])
 
 @app.route('/')
 def home():
@@ -33,61 +26,45 @@ def home():
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    if 'file' not in request.files:
-        return jsonify({"error": "No file uploaded"}), 400
+    if 'file' not in request.files or not request.form.get('job_description'):
+        return jsonify({"error": "Data Missing"}), 400
     
-    file = request.files['file']
-    job_desc = request.form.get('job_description', '')
-
-    if file.filename == '' or not job_desc:
-        return jsonify({"error": "Missing file or job description"}), 400
-
     try:
-        # Optimization 1: RAM bachane ke liye sirf pehle 1000 rows read karein
-        # Agar aapki CSV bahut badi hai toh ye zaroori hai
-        df = pd.read_csv(file, on_bad_lines='skip', encoding='latin1').head(1000)
-        
-        possible_cols = ['Resume_str', 'Resume', 'resume_text', 'Resume_Text']
-        res_col = next((c for c in possible_cols if c in df.columns), None)
-        
+        df = pd.read_csv(request.files['file'], on_bad_lines='skip', encoding='latin1').head(500)
+        jd = request.form.get('job_description')
+
+        res_col = next((c for c in ['Resume_str', 'Resume', 'resume_text'] if c in df.columns), None)
+        name_col = 'Name' if 'Name' in df.columns else None
+        cat_col = 'Category' if 'Category' in df.columns else None
+
         if not res_col:
-            return jsonify({"error": "CSV columns mismatch. Use 'Resume_str' or 'Resume'"}), 400
+            return jsonify({"error": "Resume content column not found"}), 400
 
         df = df.dropna(subset=[res_col])
+        cleaned_resumes = [clean_data(r) for r in df[res_col]]
         
-        # Optimization 2: Clean text ko directly vectorizer mein daalein
-        # Bina naya column 'cleaned' banaye, memory bachti hai
-        cleaned_resumes = [clean_text(r) for r in df[res_col]]
+        tfidf = TfidfVectorizer(max_features=2000, ngram_range=(1,2))
+        matrix = tfidf.fit_transform(cleaned_resumes)
         
-        # Optimization 3: max_features ko 1000-1500 tak rakhein Render ke liye
-        tfidf = TfidfVectorizer(max_features=1500, ngram_range=(1,2))
-        tfidf_matrix = tfidf.fit_transform(cleaned_resumes)
+        job_vec = tfidf.transform([clean_data(jd)])
+        scores = cosine_similarity(matrix, job_vec).flatten()
+        df['Match'] = (scores * 100).round(2)
         
-        job_clean = clean_text(job_desc)
-        job_vec = tfidf.transform([job_clean])
-        scores = cosine_similarity(tfidf_matrix, job_vec).flatten()
-        
-        df['Match_Score'] = (scores * 100).round(2)
-        top_matches = df.sort_values(by='Match_Score', ascending=False).head(15)
-        
-        cat_col = 'Category' if 'Category' in df.columns else None
+        ranked = df.sort_values(by='Match', ascending=False).head(10)
         
         results = []
-        for i, row in enumerate(top_matches.itertuples(), 1):
+        for i, row in enumerate(ranked.itertuples(), 1):
             results.append({
                 "rank": i,
-                "category": getattr(row, cat_col) if cat_col else f"Candidate {row.Index}",
-                "score": float(row.Match_Score) # JSON ke liye float convert karein
+                "name": getattr(row, name_col) if name_col else f"Candidate {row.Index}",
+                "category": getattr(row, cat_col) if cat_col else "N/A",
+                "score": float(row.Match)
             })
 
-        # Memory cleanup
-        del df, tfidf_matrix, cleaned_resumes
-        
         return jsonify({"results": results})
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
