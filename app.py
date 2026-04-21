@@ -10,17 +10,18 @@ import os
 
 app = Flask(__name__)
 
-# Fast Setup
+# Essential Setup for Speed
 nltk.download('stopwords', quiet=True)
 STOPWORDS = set(stopwords.words("english"))
 STEMMER = PorterStemmer()
 CLEAN_PATTERN = re.compile(r'[^a-z\s]')
 
 def fast_clean(text):
+    if not text or pd.isna(text): return ""
     text = str(text).lower()
     text = CLEAN_PATTERN.sub(' ', text)
-    words = [STEMMER.stem(w) for w in text.split() if w not in STOPWORDS and len(w) > 2]
-    return " ".join(words)
+    # Fast Stemming
+    return " ".join([STEMMER.stem(w) for w in text.split() if w not in STOPWORDS and len(w) > 2])
 
 @app.route('/')
 def home():
@@ -29,56 +30,62 @@ def home():
 @app.route('/predict', methods=['POST'])
 def predict():
     if 'file' not in request.files or not request.form.get('job_description'):
-        return jsonify({"error": "Missing input"}), 400
+        return jsonify({"error": "Missing file or description"}), 400
     
     file = request.files['file']
     jd = request.form.get('job_description')
 
     try:
-        # Load CSV
-        df = pd.read_csv(file, on_bad_lines='skip', encoding='latin1').head(500)
+        # Optimization: Sirf headers read karke column detect karna
+        header_df = pd.read_csv(file, nrows=0, encoding='latin1')
+        file.seek(0)
         
-        # --- SABSE ZAROORI FIX: HEADERS CLEANING ---
-        # Column names se spaces hatana aur sabko lowercase banana
-        df.columns = [str(c).strip().lower() for c in df.columns]
+        all_cols = [str(c).strip().lower() for c in header_df.columns]
+        col_map = {str(c).strip().lower(): c for c in header_df.columns}
+        
+        name_key = next((k for k in all_cols if 'name' in k), None)
+        res_key = next((k for k in all_cols if 'resume' in k or 'text' in k), None)
+        cat_key = next((k for k in all_cols if 'category' in k or 'role' in k), None)
 
-        # Name column detect karne ka foolproof tareeka
-        name_col = next((c for c in df.columns if 'name' in c), None)
-        res_col = next((c for c in df.columns if 'resume' in c or 'text' in c), None)
-        cat_col = next((c for c in df.columns if 'category' in c or 'role' in c), None)
-
-        if not res_col:
+        if not res_key:
             return jsonify({"error": "Resume text column not found"}), 400
 
-        # Fast Analysis
-        resumes = df[res_col].fillna("").astype(str).tolist()
-        cleaned_resumes = [fast_clean(r) for r in resumes]
+        # Memory Optimization: Load only necessary columns
+        target_cols = [col_map[k] for k in [name_key, res_key, cat_key] if k]
+        df = pd.read_csv(file, usecols=target_cols, on_bad_lines='skip', encoding='latin1').head(5000)
         
-        tfidf = TfidfVectorizer(max_features=1000, stop_words='english')
+        # Column Normalization
+        df.columns = [str(c).strip().lower() for c in df.columns]
+
+        # Fast Processing
+        cleaned_resumes = [fast_clean(r) for r in df[res_key]]
+        tfidf = TfidfVectorizer(max_features=1500)
         matrix = tfidf.fit_transform(cleaned_resumes)
         job_vec = tfidf.transform([fast_clean(jd)])
         
+        # Similarity Calculation
         scores = cosine_similarity(matrix, job_vec).flatten()
         df['match_score'] = (scores * 100).round(2)
         
-        top_df = df.sort_values(by='match_score', ascending=False).head(10)
+        # --- CRITICAL FIX: REMOVE 0% MATCHES AND RANK ---
+        # Sirf unhe rakho jinka score 0 se zyada hai
+        filtered_df = df[df['match_score'] > 0].sort_values(by='match_score', ascending=False).head(15)
         
-        # --- DATA EXTRACTION FIX ---
+        if filtered_df.empty:
+            return jsonify({"results": [], "message": "No matching candidates found above 0%"})
+
         results = []
-        # to_dict('records') se column names perfectly access hote hain
-        records = top_df.to_dict(orient='records')
-        
-        for i, row in enumerate(records, 1):
-            # Agar name_col mila toh uska data lo, warna Candidate ID dikhao
-            candidate_real_name = str(row.get(name_col)) if name_col and pd.notna(row.get(name_col)) else f"Candidate {i}"
-            
+        for i, row in enumerate(filtered_df.to_dict(orient='records'), 1):
             results.append({
                 "rank": i,
-                "name": candidate_real_name,
-                "category": str(row.get(cat_col, "General Profile")).title(),
+                "name": str(row.get(name_key, f"Candidate {i}")),
+                "category": str(row.get(cat_key, "General Profile")).title(),
                 "score": float(row['match_score'])
             })
 
+        # Memory Clean
+        del df, matrix, cleaned_resumes, filtered_df
+        
         return jsonify({"results": results})
 
     except Exception as e:
