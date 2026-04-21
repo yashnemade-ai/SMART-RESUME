@@ -3,28 +3,24 @@ import pandas as pd
 import re
 import nltk
 from nltk.corpus import stopwords
-from nltk.stem import WordNetLemmatizer
+from nltk.stem import PorterStemmer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import os
 
 app = Flask(__name__)
 
-# NLTK resources setup
+# Fast Setup
 nltk.download('stopwords', quiet=True)
-nltk.download('wordnet', quiet=True)
-nltk.download('omw-1.4', quiet=True)
+STOPWORDS = set(stopwords.words("english"))
+STEMMER = PorterStemmer()
+CLEAN_PATTERN = re.compile(r'[^a-z\s]')
 
-stop_words = set(stopwords.words("english"))
-lemmatizer = WordNetLemmatizer()
-
-def clean_data(text):
-    if not isinstance(text, str):
-        return ""
-    text = text.lower()
-    text = re.sub(r'[^a-z]', ' ', text)
-    tokens = text.split()
-    return " ".join([lemmatizer.lemmatize(t) for t in tokens if t not in stop_words])
+def fast_clean(text):
+    text = str(text).lower()
+    text = CLEAN_PATTERN.sub(' ', text)
+    words = [STEMMER.stem(w) for w in text.split() if w not in STOPWORDS and len(w) > 2]
+    return " ".join(words)
 
 @app.route('/')
 def home():
@@ -33,62 +29,60 @@ def home():
 @app.route('/predict', methods=['POST'])
 def predict():
     if 'file' not in request.files or not request.form.get('job_description'):
-        return jsonify({"error": "CSV file and Job Description required"}), 400
+        return jsonify({"error": "Missing input"}), 400
     
     file = request.files['file']
     jd = request.form.get('job_description')
 
     try:
-        # Optimization: head(500) for Render's limited RAM
+        # Load CSV
         df = pd.read_csv(file, on_bad_lines='skip', encoding='latin1').head(500)
+        
+        # --- SABSE ZAROORI FIX: HEADERS CLEANING ---
+        # Column names se spaces hatana aur sabko lowercase banana
+        df.columns = [str(c).strip().lower() for c in df.columns]
 
-        # --- STEP 1: FIX COLUMN NAMES (IMPORTANT) ---
-        # Sabhi column names se spaces hatana aur lowercase karna
-        df.columns = df.columns.str.strip().str.lower()
-
-        # Dynamic Column Detection
-        # Ab hum lowercase mein check karenge
-        name_col = next((c for c in df.columns if c in ['name', 'candidate name', 'candidate_name', 'names']), None)
-        res_col = next((c for c in df.columns if c in ['resume_str', 'resume', 'resume_text', 'text', 'content']), None)
-        cat_col = next((c for c in df.columns if c in ['category', 'job role', 'role', 'department']), None)
+        # Name column detect karne ka foolproof tareeka
+        name_col = next((c for c in df.columns if 'name' in c), None)
+        res_col = next((c for c in df.columns if 'resume' in c or 'text' in c), None)
+        cat_col = next((c for c in df.columns if 'category' in c or 'role' in c), None)
 
         if not res_col:
-            return jsonify({"error": "Resume content column not found in CSV. Use 'Resume_str' or 'Resume'."}), 400
+            return jsonify({"error": "Resume text column not found"}), 400
 
-        # --- STEP 2: CLEAN DATA ---
-        df = df.dropna(subset=[res_col])
-        cleaned_resumes = [clean_data(str(r)) for r in df[res_col]]
+        # Fast Analysis
+        resumes = df[res_col].fillna("").astype(str).tolist()
+        cleaned_resumes = [fast_clean(r) for r in resumes]
         
-        # --- STEP 3: ML PROCESSING ---
-        # sublinear_tf=True helps in better keyword importance
-        tfidf = TfidfVectorizer(max_features=2500, ngram_range=(1,2), sublinear_tf=True)
+        tfidf = TfidfVectorizer(max_features=1000, stop_words='english')
         matrix = tfidf.fit_transform(cleaned_resumes)
+        job_vec = tfidf.transform([fast_clean(jd)])
         
-        job_vec = tfidf.transform([clean_data(jd)])
         scores = cosine_similarity(matrix, job_vec).flatten()
-        
         df['match_score'] = (scores * 100).round(2)
         
-        # Sort by Match Score
-        ranked_df = df.sort_values(by='match_score', ascending=False).head(10)
+        top_df = df.sort_values(by='match_score', ascending=False).head(10)
         
-        # --- STEP 4: FORMAT RESULTS ---
+        # --- DATA EXTRACTION FIX ---
         results = []
-        for i, row in enumerate(ranked_df.to_dict(orient='records'), 1):
+        # to_dict('records') se column names perfectly access hote hain
+        records = top_df.to_dict(orient='records')
+        
+        for i, row in enumerate(records, 1):
+            # Agar name_col mila toh uska data lo, warna Candidate ID dikhao
+            candidate_real_name = str(row.get(name_col)) if name_col and pd.notna(row.get(name_col)) else f"Candidate {i}"
+            
             results.append({
                 "rank": i,
-                # Safe access using normalized column names
-                "name": str(row.get(name_col, f"Candidate {i-1}")),
-                "category": str(row.get(cat_col, "General")),
-                "score": float(row.get('match_score', 0))
+                "name": candidate_real_name,
+                "category": str(row.get(cat_col, "General Profile")).title(),
+                "score": float(row['match_score'])
             })
 
         return jsonify({"results": results})
 
     except Exception as e:
-        print(f"Error: {e}")
-        return jsonify({"error": f"Server Error: {str(e)}"}), 500
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
