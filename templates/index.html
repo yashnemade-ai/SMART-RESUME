@@ -9,6 +9,7 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>">
     
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Visualization Library -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
@@ -83,6 +84,7 @@
         </div>
 
         <div class="space-y-6">
+            <!-- Yash Nemade Profile -->
             <div class="dev-card p-6 rounded-3xl group">
                 <div class="flex items-center space-x-4">
                     <div class="w-14 h-14 rounded-2xl bg-indigo-600 flex items-center justify-center font-bold text-white shadow-lg text-xl">YN</div>
@@ -93,10 +95,11 @@
                 </div>
                 <div class="flex space-x-4 mt-6">
                     <a href="https://github.com/yashnemade-ai" target="_blank" class="text-slate-400 hover:text-white transition text-lg"><i class="fab fa-github"></i></a>
-                    <a href="https://linkedin.com/" target="_blank" class="text-slate-400 hover:text-indigo-500 transition text-lg"><i class="fab fa-linkedin"></i></a>
+                    <a href="https://linkedin.com/in/yash-nemade" target="_blank" class="text-slate-400 hover:text-indigo-500 transition text-lg"><i class="fab fa-linkedin"></i></a>
                 </div>
             </div>
 
+            <!-- Sumit Bombale Profile -->
             <div class="dev-card p-6 rounded-3xl group">
                 <div class="flex items-center space-x-4">
                     <div class="w-14 h-14 rounded-2xl bg-amber-600 flex items-center justify-center font-bold text-white shadow-lg text-xl">SB</div>
@@ -110,10 +113,15 @@
                     <a href="https://linkedin.com/" target="_blank" class="text-slate-400 hover:text-amber-500 transition text-lg"><i class="fab fa-linkedin"></i></a>
                 </div>
             </div>
+
+            <div class="p-6 rounded-3xl bg-indigo-500/10 border border-indigo-500/20 mt-8">
+                <p class="text-[10px] font-black uppercase tracking-widest text-indigo-400 mb-2">Project Info</p>
+                <p class="text-[11px] opacity-60 leading-relaxed">Advanced Big Data Analytics System developed for University Mini-Project 2026.</p>
+            </div>
         </div>
     </aside>
 
-    <!-- Navbar -->
+    <!-- Premium Navbar -->
     <nav class="border-b border-white/5 glass sticky top-0 z-50">
         <div class="container mx-auto px-8 py-4 flex justify-between items-center">
             <div class="flex items-center space-x-6">
@@ -130,20 +138,27 @@
                     </div>
                 </div>
             </div>
-            <button id="theme-btn" onclick="handleThemeToggle()" class="w-10 h-10 rounded-xl glass flex items-center justify-center hover:scale-110 transition-all border border-white/5">
+            
+            <button onclick="handleThemeToggle()" class="w-10 h-10 rounded-xl glass flex items-center justify-center hover:scale-110 transition-all border border-white/5 group">
                 <i id="theme-icon" class="fas fa-moon text-indigo-400"></i>
             </button>
         </div>
     </nav>
 
     <main class="container mx-auto px-6 pt-16 max-w-6xl">
+        <!-- Hero Section -->
         <div class="text-center mb-20">
             <h2 class="text-5xl md:text-7xl font-black mb-4 tracking-tighter leading-tight uppercase">
                 SMART RESUME SCREENING <br> <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">& JOB MATCHING</span>
             </h2>
-            <div class="h-1.5 w-32 bg-indigo-600 mx-auto rounded-full mb-8"></div>
-        </div>
+            
+<div class="h-1.5 w-32 bg-white mx-auto rounded-full mb-8"></div>
+<p class="text-slate-400 text-lg max-w-2xl mx-auto font-medium"></p>
+            Identify top-tier talent using clinical precision and high-dimensional vector space analysis.
+        </p>
+    </div>
 
+        <!-- Dashboard Inputs -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
             <div class="lg:col-span-5 glass p-10 rounded-[2.5rem] hover:border-indigo-500/30 transition-all group cursor-pointer" onclick="document.getElementById('csvFile').click()">
                 <div class="flex items-center mb-8">
@@ -162,7 +177,9 @@
                     <h3 class="text-xl font-bold uppercase tracking-tight">2. Job Profile</h3>
                     <i class="fas fa-briefcase ml-auto text-cyan-500/50"></i>
                 </div>
-                <textarea id="jobDesc" rows="5" class="w-full bg-white/5 border border-white/10 rounded-3xl p-6 outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all resize-none text-slate-200" placeholder="Enter skills and requirements..."></textarea>
+                <textarea id="jobDesc" rows="5" 
+                    class="w-full bg-white/5 border border-white/10 rounded-3xl p-6 outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all resize-none text-slate-200 placeholder:text-slate-600"
+                    placeholder="Enter skills and requirements..."></textarea>
             </div>
         </div>
 
@@ -173,21 +190,25 @@
             </button>
         </div>
 
-        <!-- Results Table -->
-        <div id="resultsSection" class="hidden">
-            <div class="flex items-end justify-between mb-10 px-4">
-                <h3 class="text-4xl font-black uppercase tracking-tighter">Ranking Report</h3>
-                <div id="countBadge" class="px-6 py-2 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-black uppercase tracking-widest text-indigo-400"></div>
+        <!-- Results & Visualization Section -->
+        <div id="resultsSection" class="hidden space-y-12">
+            <!-- Visualization Chart -->
+            <div class="glass p-10 rounded-[3rem]">
+                <h3 class="text-xl font-bold mb-8 uppercase tracking-widest text-indigo-400 text-center">Compatibility Analytics</h3>
+                <div class="h-80">
+                    <canvas id="matchChart"></canvas>
+                </div>
             </div>
-            
+
+            <!-- Table Results -->
             <div class="glass rounded-[3rem] overflow-hidden">
                 <table class="w-full text-left">
                     <thead>
                         <tr class="bg-white/5 border-b border-white/5">
-                            <th class="px-10 py-8 text-[10px] uppercase font-black text-slate-500 tracking-[0.3em]">Rank</th>
-                            <th class="px-10 py-8 text-[10px] uppercase font-black text-slate-500 tracking-[0.3em]">Candidate Name</th>
-                            <th class="px-10 py-8 text-[10px] uppercase font-black text-slate-500 tracking-[0.3em]">Professional Category</th>
-                            <th class="px-10 py-8 text-[10px] uppercase font-black text-slate-500 text-right tracking-[0.3em]">Match Score</th>
+                            <th class="px-8 py-6 text-[10px] uppercase font-black text-slate-500 tracking-[0.3em]">Rank</th>
+                            <th class="px-8 py-6 text-[10px] uppercase font-black text-slate-500 tracking-[0.3em]">Candidate Name</th>
+                            <th class="px-8 py-6 text-[10px] uppercase font-black text-slate-500 tracking-[0.3em]">Professional Category</th>
+                            <th class="px-8 py-6 text-[10px] uppercase font-black text-slate-500 text-right tracking-[0.3em]">Score</th>
                         </tr>
                     </thead>
                     <tbody id="resultsTable" class="divide-y divide-white/5"></tbody>
@@ -201,37 +222,60 @@
     </footer>
 
     <script>
-        // Theme Engine
-        function handleThemeToggle() {
-            const html = document.documentElement;
-            const icon = document.getElementById('theme-icon');
-            const target = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-            html.setAttribute('data-theme', target);
-            localStorage.setItem('theme', target);
-            icon.className = target === 'dark' ? 'fas fa-moon text-indigo-400' : 'fas fa-sun text-amber-500';
-            document.body.style.background = target === 'dark' ? 'radial-gradient(circle at 0% 0%, #1e1b4b 0%, #050507 50%)' : '#f1f5f9';
+        let myChart = null;
+
+        // --- THEME ENGINE (FIXED) ---
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeUI(savedTheme);
         }
 
-        // Initialize Theme
-        const savedTheme = localStorage.getItem('theme') || 'dark';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-        document.getElementById('theme-icon').className = savedTheme === 'dark' ? 'fas fa-moon text-indigo-400' : 'fas fa-sun text-amber-500';
+        function handleThemeToggle() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const target = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', target);
+            localStorage.setItem('theme', target);
+            updateThemeUI(target);
+        }
+
+        function updateThemeUI(theme) {
+            const icon = document.getElementById('theme-icon');
+            if (theme === 'dark') {
+                icon.className = 'fas fa-moon text-indigo-400';
+                document.body.style.background = 'radial-gradient(circle at 0% 0%, #1e1b4b 0%, #050507 50%)';
+            } else {
+                icon.className = 'fas fa-sun text-amber-500';
+                document.body.style.background = '#f1f5f9';
+            }
+        }
+
+        initTheme();
 
         function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('active');
-            document.getElementById('sidebar-overlay').classList.toggle('hidden');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('hidden');
         }
 
         document.getElementById('csvFile').onchange = function() {
-            if(this.files[0]) document.getElementById('fileName').innerHTML = this.files[0].name;
+            if(this.files[0]) {
+                document.getElementById('fileName').innerHTML = this.files[0].name;
+                document.getElementById('fileName').className = 'text-indigo-400 font-bold';
+            }
         };
 
         async function startAI() {
             const file = document.getElementById('csvFile').files[0];
             const jd = document.getElementById('jobDesc').value;
-            if(!file || !jd) return alert("System requires data.");
+            const btn = document.getElementById('btn');
+            
+            if(!file || !jd) return alert("System requires database and job profile.");
 
-            document.getElementById('btn').innerHTML = "Analyzing...";
+            btn.innerHTML = '<div class="w-5 h-5 border-2 border-white rounded-full loader mr-4"></div> Computing...';
+            btn.disabled = true;
+
             const formData = new FormData();
             formData.append('file', file);
             formData.append('job_description', jd);
@@ -240,9 +284,15 @@
                 const response = await fetch('/predict', { method: 'POST', body: formData });
                 const data = await response.json();
                 if(data.error) alert(data.error);
-                else showMatches(data.results);
-            } catch (e) { alert("Connection Error."); }
-            finally { document.getElementById('btn').innerHTML = '<i class="fas fa-bolt mr-4"></i><span>Rank Candidates</span>'; }
+                else {
+                    showMatches(data.results);
+                    renderChart(data.results);
+                }
+            } catch (e) { alert("Connection error."); }
+            finally {
+                btn.innerHTML = '<i class="fas fa-bolt mr-4"></i><span>Rank Candidates</span>';
+                btn.disabled = false;
+            }
         }
 
         function showMatches(results) {
@@ -250,37 +300,62 @@
             const section = document.getElementById('resultsSection');
             table.innerHTML = '';
             section.classList.remove('hidden');
-            document.getElementById('countBadge').innerHTML = `${results.length} Candidates Screened`;
 
             results.forEach((res, i) => {
                 let rankIcon = '';
-                if(res.rank === 1) rankIcon = '<i class="fas fa-crown text-[#ffd700] mr-2"></i>';
-                else if(res.rank === 2) rankIcon = '<i class="fas fa-medal text-[#c0c0c0] mr-2"></i>';
-                else if(res.rank === 3) rankIcon = '<i class="fas fa-award text-[#cd7f32] mr-2"></i>';
+                if(res.rank === 1) rankIcon = '<i class="fas fa-crown rank-1 mr-2 text-2xl"></i>';
+                else if(res.rank === 2) rankIcon = '<i class="fas fa-medal rank-2 mr-2 text-2xl"></i>';
+                else if(res.rank === 3) rankIcon = '<i class="fas fa-award rank-3 mr-2 text-2xl"></i>';
+                else rankIcon = `<span class="opacity-20 font-black">#${res.rank}</span>`;
 
                 table.innerHTML += `
                     <tr class="hover:bg-white/[0.03] transition-all group fade-up" style="animation-delay: ${i * 0.1}s">
-                        <td class="px-10 py-10">
-                            <div class="flex items-center">
-                                ${rankIcon}
-                                <span class="font-black text-xl text-slate-600 group-hover:text-slate-200">#${res.rank}</span>
-                            </div>
-                        </td>
-                        <td class="px-10 py-10 font-bold text-xl text-indigo-400">${res.name || 'Candidate ' + (i+1)}</td>
-                        <td class="px-10 py-10">
+                        <td class="px-8 py-10 text-center">${rankIcon}</td>
+                        <td class="px-8 py-10 font-bold text-xl text-indigo-400">${res.name}</td>
+                        <td class="px-8 py-10">
                             <div class="text-lg font-bold">${res.category}</div>
-                            <div class="text-[9px] font-black uppercase text-slate-500 tracking-widest mt-1">NLP Verified</div>
+                            <div class="text-[9px] font-black uppercase text-slate-500 tracking-widest mt-1">NLP Engine Verified</div>
                         </td>
-                        <td class="px-10 py-10 text-right">
+                        <td class="px-8 py-10 text-right">
                             <div class="text-3xl font-black ${res.score > 70 ? 'text-emerald-400' : 'text-indigo-400'}">${res.score}%</div>
                             <div class="w-32 h-1 bg-white/5 rounded-full mt-3 ml-auto overflow-hidden">
-                                <div class="h-full bg-indigo-600" style="width: ${res.score}%"></div>
+                                <div class="h-full bg-gradient-to-r from-indigo-600 to-cyan-500 shadow-[0_0_10px_#4f46e5]" style="width: ${res.score}%"></div>
                             </div>
                         </td>
                     </tr>
                 `;
             });
             window.scrollTo({ top: section.offsetTop - 50, behavior: 'smooth' });
+        }
+
+        function renderChart(results) {
+            const ctx = document.getElementById('matchChart').getContext('2d');
+            if(myChart) myChart.destroy();
+
+            myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: results.map(r => r.name),
+                    datasets: [{
+                        label: 'Match Confidence (%)',
+                        data: results.map(r => r.score),
+                        backgroundColor: 'rgba(99, 102, 241, 0.4)',
+                        borderColor: '#6366f1',
+                        borderWidth: 2,
+                        borderRadius: 10,
+                        hoverBackgroundColor: '#6366f1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, max: 100, ticks: { color: '#64748b' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                        x: { ticks: { color: '#64748b' }, grid: { display: false } }
+                    }
+                }
+            });
         }
     </script>
 </body>
