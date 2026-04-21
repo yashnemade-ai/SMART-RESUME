@@ -1,62 +1,73 @@
-import requests
+import streamlit as st
+import pandas as pd
+import numpy as np
+import re
+import matplotlib.pyplot as plt
+import seaborn as sns
+import nltk
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics.pairwise import cosine_similarity
 
-# --- सेटिंग्स ---
-M3U_URL = "https://raw.githubusercontent.com/Sflex0719/ZioGarmTara/main/ZioGarmTara.m3u"
-NPOINT_URL = "https://api.npoint.io/c0aa4f57f93105ce45de"
+st.set_page_config(page_title="Smart Resume Screener", layout="wide")
 
-def get_m3u_links():
-    """M3U से सभी चैनल्स के नाम और लिंक निकालता है"""
-    try:
-        response = requests.get(M3U_URL)
-        lines = response.text.splitlines()
-        m3u_map = {}
-        for i, line in enumerate(lines):
-            if line.startswith("#EXTINF"):
-                name = line.split(",")[-1].strip() # नाम निकालता है
-                link = lines[i+1].strip() # अगली लाइन का लिंक निकालता है
-                m3u_map[name] = link
-        return m3u_map
-    except:
-        return {}
+nltk.download('stopwords', quiet=True)
+nltk.download('wordnet', quiet=True)
 
-def update_process():
-    # 1. ताज़ा लिंक्स लोड करें
-    m3u_data = get_m3u_links()
+def clean_resume(text):
+    if not isinstance(text, str): return ""
+    text = text.lower()
+    text = re.sub(r'http\S+\s*', ' ', text)
+    text = re.sub(r'[^a-zA-Z]', ' ', text)
+    text = re.sub(r'\s+', ' ', text).strip()
+    stop_words = set(stopwords.words("english"))
+    lemmatizer = WordNetLemmatizer()
+    return " ".join([lemmatizer.lemmatize(w) for w in text.split() if w not in stop_words])
+
+st.title("🎯 Smart Resume Screening & Job Matching")
+st.markdown("---")
+
+uploaded_file = st.sidebar.file_uploader("Upload Resume Dataset (CSV)", type=["csv"])
+job_description = st.text_area("Enter Job Description:", height=150, placeholder="Looking for a Python Developer...")
+
+if uploaded_file and job_description:
+    df = pd.read_csv(uploaded_file, on_bad_lines='skip', encoding='latin1')
+    df.dropna(subset=['Resume_str', 'Category'], inplace=True)
     
-    # 2. npoint से अपना JSON मंगवाएं
-    response = requests.get(NPOINT_URL)
-    json_list = response.json()
-
-    updated = False
-    
-    # 3. लिस्ट में हर चैनल चेक करें
-    for channel in json_list:
-        current_url = channel.get("url", "")
+    with st.spinner('AI Engine Training...'):
+        df['cleaned'] = df['Resume_str'].apply(clean_resume)
+        tfidf = TfidfVectorizer(max_features=2000, ngram_range=(1,2))
+        X = tfidf.fit_transform(df['cleaned'])
         
-        # अगर लिंक के आखिर में # लगा है
-        if current_url.endswith("#"):
-            channel_name = channel.get("name") # JSON में जो नाम है
-            
-            # M3U में उस नाम का लिंक ढूंढें
-            # ध्यान दें: JSON का "name" और M3U का "name" एक जैसा होना चाहिए
-            if channel_name in m3u_data:
-                new_link = m3u_data[channel_name]
-                
-                # नया लिंक डालो और आखिर में फिर से # लगा दो (अगली बार के लिए)
-                channel["url"] = new_link + "#"
-                updated = True
-                print(f"Updated: {channel_name}")
-            else:
-                # अगर नाम थोड़ा अलग है (जैसे M3U में 'Star Plus' और JSON में 'Star Plus HD')
-                # तो यहाँ मैन्युअल चेक भी डाल सकते हैं
-                print(f"Not found in M3U: {channel_name}")
+        job_vec = tfidf.transform([clean_resume(job_description)])
+        scores = cosine_similarity(X, job_vec).flatten()
+        df['Match_Score'] = (scores * 100).round(2)
+        
+    col1, col2 = st.columns([1, 1])
 
-    # 4. अगर बदलाव हुए हैं तो सेव करें
-    if updated:
-        requests.post(NPOINT_URL, json=json_list)
-        print("npoint.io successfully updated!")
-    else:
-        print("No links found with # marker.")
+    with col1:
+        st.subheader("📊 Dataset Overview")
+        fig1, ax1 = plt.subplots()
+        sns.countplot(y=df['Category'], order=df['Category'].value_counts().index[:10], palette='viridis', ax=ax1)
+        st.pyplot(fig1)
 
-if __name__ == "__main__":
-    update_process()
+    matches = df[df['Match_Score'] >= 15].sort_values(by='Match_Score', ascending=False).head(10)
+
+    with col2:
+        st.subheader("🏆 Top Candidate Matches")
+        if not matches.empty:
+            st.dataframe(matches[['Category', 'Match_Score']], use_container_width=True)
+        else:
+            st.warning("No matches found above 15%")
+
+    if not matches.empty:
+        st.markdown("---")
+        st.subheader("📈 Match Analysis")
+        fig2, ax2 = plt.subplots(figsize=(10, 4))
+        sns.barplot(x=matches['Match_Score'], y=[f"ID {i}" for i in matches.index], palette="magma", ax=ax2)
+        st.pyplot(fig2)
+
+else:
+    st.info("Please upload a CSV file and enter a job description to begin.")
