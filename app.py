@@ -1,173 +1,98 @@
+from flask import Flask, render_template, request, jsonify
 import pandas as pd
 import numpy as np
 import re
-import matplotlib.pyplot as plt
-import seaborn as sns
 import nltk
-import time
-
+import os
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
-
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, classification_report
 from sklearn.metrics.pairwise import cosine_similarity
 
-# Download required resources
+app = Flask(__name__)
+
+# --- Big Data NLP Initialization ---
 nltk.download('stopwords', quiet=True)
 nltk.download('wordnet', quiet=True)
+nltk.download('omw-1.4', quiet=True)
 
-# -------------------------------
-# Text Cleaning Function
-# -------------------------------
-def clean_text(text):
-    if not isinstance(text, str):
-        return ""
-
+def perform_nlp_cleaning(text):
+    if not isinstance(text, str): return ""
+    # Standardizing for High-Dimensional Vector Space
     text = text.lower()
     text = re.sub(r'http\S+\s*', '', text)
-    text = re.sub(r'RT|cc', '', text)
-    text = re.sub(r'#\S+', '', text)
-    text = re.sub(r'@\S+', '', text)
-    text = re.sub(r'[^a-zA-Z ]', ' ', text)
+    text = re.sub(r'RT|cc|#\S+|@\S+|[^a-zA-Z ]', ' ', text)
     text = re.sub(r'\s+', ' ', text).strip()
-
+    
     stop_words = set(stopwords.words("english"))
     lemmatizer = WordNetLemmatizer()
+    # Feature Normalization via Lemmatization
+    return " ".join([lemmatizer.lemmatize(w) for w in text.split() if w not in stop_words])
 
-    return " ".join([
-        lemmatizer.lemmatize(w)
-        for w in text.split()
-        if w not in stop_words
-    ])
+@app.route('/')
+def index():
+    return render_template('index.html')
 
-# -------------------------------
-# Main Function
-# -------------------------------
-def run_smart_screening():
-
-    print("\n" + "="*80)
-    print(" " * 20 + "SMART RESUME SCREENING SYSTEM")
-    print("="*80)
+@app.route('/predict', methods=['POST'])
+def predict():
+    if 'file' not in request.files or not request.form.get('job_description'):
+        return jsonify({"error": "Data stream incomplete"}), 400
+    
+    file = request.files['file']
+    job_description = request.form.get('job_description')
 
     try:
-        df = pd.read_csv("Resume.csv", on_bad_lines='skip', encoding='latin1')
-        df.dropna(subset=['Resume_str', 'Category'], inplace=True)
+        # Optimization for Large Datasets (Big Data constraint)
+        # Reading only first 2500 records to maintain speed on Render
+        df = pd.read_csv(file, on_bad_lines='skip', encoding='latin1').head(2500)
+        
+        # Header Normalization (Handling BOM and spaces)
+        df.columns = df.columns.str.strip().str.lower()
+        
+        # Automated Column Detection
+        res_col = next((c for c in df.columns if 'resume' in c or 'text' in c), None)
+        name_col = next((c for c in df.columns if 'name' in c), None)
+        cat_col = next((c for c in df.columns if 'category' in c or 'role' in c), None)
+
+        if not res_col:
+            return jsonify({"error": "Resume Feature Column not detected"}), 400
+
+        df = df.dropna(subset=[res_col])
+        
+        # [BIG DATA STEP]: Feature Extraction via TF-IDF Vectorization
+        tfidf = TfidfVectorizer(max_features=3000, ngram_range=(1, 2), sublinear_tf=True)
+        
+        # Processing Data Stream
+        cleaned_resumes = [perform_nlp_cleaning(str(r)) for r in df[res_col]]
+        vector_matrix = tfidf.fit_transform(cleaned_resumes)
+        
+        # [BIG DATA STEP]: Similarity Measure using Cosine Distance
+        job_query_vec = tfidf.transform([perform_nlp_cleaning(job_description)])
+        similarity_scores = cosine_similarity(vector_matrix, job_query_vec).flatten()
+        
+        df['match_confidence'] = (similarity_scores * 100).round(2)
+        
+        # Filtering Zero-Impact Nodes
+        ranked_results = df[df['match_confidence'] > 0].sort_values(by='match_confidence', ascending=False).head(15)
+        
+        if ranked_results.empty:
+            return jsonify({"results": [], "message": "No relevant matches in current vector space"})
+
+        # Constructing Output Payload
+        results = []
+        for i, row in enumerate(ranked_results.to_dict(orient='records'), 1):
+            results.append({
+                "rank": i,
+                "name": str(row.get(name_col, f"Node-{i}")),
+                "category": str(row.get(cat_col, "General Profile")).title(),
+                "score": float(row.get('match_confidence', 0))
+            })
+
+        return jsonify({"results": results})
+
     except Exception as e:
-        print(f"CRITICAL ERROR: {e}")
-        return
+        return jsonify({"error": f"Algorithm Error: {str(e)}"}), 500
 
-    # -------------------------------
-    # STEP 1: Visualization
-    # -------------------------------
-    print("\n[STEP 1] DATASET INSIGHTS & VISUALIZATION...")
-
-    plt.figure(figsize=(12, 8))
-    sns.countplot(
-        y=df['Category'],
-        order=df['Category'].value_counts().index,
-        palette='magma'
-    )
-
-    plt.title("RESUME CATEGORY DISTRIBUTION", fontsize=14, fontweight='bold')
-    plt.grid(axis='x', linestyle='--', alpha=0.7)
-    plt.tight_layout()
-    plt.show()
-
-    # -------------------------------
-    # STEP 2: Model Training
-    # -------------------------------
-    print("\n[STEP 2] AI ENGINE INITIALIZATION...")
-
-    df['cleaned'] = df['Resume_str'].apply(clean_text)
-
-    tfidf = TfidfVectorizer(max_features=3000, ngram_range=(1, 2))
-    X = tfidf.fit_transform(df['cleaned'])
-    y = df['Category']
-
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42
-    )
-
-    rf_classifier = RandomForestClassifier(n_estimators=150, random_state=42)
-    rf_classifier.fit(X_train, y_train)
-
-    predictions = rf_classifier.predict(X_test)
-    accuracy = accuracy_score(y_test, predictions)
-
-    print(f"> AI Model Accuracy: {accuracy * 100:.2f}%")
-
-    # -------------------------------
-    # STEP 3: Job Matching
-    # -------------------------------
-    job_description = """
-    Looking for a Senior Data Scientist or Software Engineer.
-    Must have expertise in Python, Machine Learning, Deep Learning,
-    Natural Language Processing (NLP), and Big Data Analytics.
-    Experience with SQL, Pandas, and Scikit-learn is required.
-    """
-
-    print("\n[STEP 3] PROCESSING JOB MATCHING...")
-    time.sleep(1)
-
-    job_vec = tfidf.transform([clean_text(job_description)])
-    match_scores = cosine_similarity(X, job_vec).flatten()
-
-    df['Match_Confidence'] = (match_scores * 100).round(2)
-
-    qualified_candidates = df[df['Match_Confidence'] >= 20] \
-        .sort_values(by='Match_Confidence', ascending=False)
-
-    print("\n" + "="*80)
-    print(f"{'RANK':<6} | {'CATEGORY':<35} | {'MATCH %':<10}")
-    print("="*80)
-
-    top_results = qualified_candidates.head(10)
-
-    for i, row in enumerate(top_results.itertuples(), 1):
-        print(f"#{i:<5} | {row.Category:<35} | {row.Match_Confidence:>8}%")
-
-    print("="*80)
-    print(f"POOL SIZE: {len(df)} | MATCHED: {len(qualified_candidates)}")
-
-    # -------------------------------
-    # STEP 4: Dashboard
-    # -------------------------------
-    print("\n[STEP 4] GENERATING DASHBOARD...")
-
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(18, 7))
-
-    sns.barplot(
-        x=top_results['Match_Confidence'],
-        y=[f"ID {idx}" for idx in top_results.index],
-        ax=ax1,
-        palette="rocket"
-    )
-
-    ax1.set_title("TOP 10 CANDIDATES")
-    ax1.set_xlabel("Match Confidence (%)")
-
-    sector_counts = qualified_candidates['Category'].value_counts().head(5)
-
-    ax2.pie(
-        sector_counts,
-        labels=sector_counts.index,
-        autopct='%1.1f%%',
-        startangle=140,
-        colors=sns.color_palette("viridis", len(sector_counts)),
-        explode=[0.07]*len(sector_counts)
-    )
-
-    ax2.set_title("TOP MATCHED SECTORS")
-
-    plt.tight_layout()
-    plt.show()
-
-
-# -------------------------------
-# Run
-# -------------------------------
 if __name__ == "__main__":
-    run_smart_screening()
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
