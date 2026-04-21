@@ -4,29 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Smart Resume | Premium Screening</title>
+    
+    <!-- Chrome Tab Logo -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --bg-deep: #050507;
+            --bg-body: radial-gradient(circle at 0% 0%, #1e1b4b 0%, #050507 50%);
             --glass: rgba(17, 18, 23, 0.9);
+            --text: #f8fafc;
+            --border: rgba(255, 255, 255, 0.05);
             --primary: #6366f1;
-            --accent: #f59e0b;
+        }
+
+        [data-theme="light"] {
+            --bg-body: #f1f5f9;
+            --glass: rgba(255, 255, 255, 0.8);
+            --text: #0f172a;
+            --border: rgba(0, 0, 0, 0.1);
+            --primary: #4f46e5;
         }
 
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: radial-gradient(circle at 0% 0%, #1e1b4b 0%, #050507 50%);
-            color: #f8fafc;
+            background: var(--bg-body);
+            background-attachment: fixed;
+            color: var(--text);
+            transition: all 0.5s ease;
             overflow-x: hidden;
         }
 
-        /* Glassmorphism Refined */
         .glass { 
             background: var(--glass); 
-            border: 1px solid rgba(255, 255, 255, 0.05); 
+            border: 1px solid var(--border); 
             backdrop-filter: blur(25px); 
         }
 
@@ -35,111 +49,111 @@
             transform: translateX(-100%);
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        #sidebar.active {
-            transform: translateX(0);
-        }
+        #sidebar.active { transform: translateX(0); }
 
-        /* Modern Gradient Button */
+        /* Modern Button */
         .btn-shine {
             background: linear-gradient(135deg, #0891b2 0%, #10b981 100%);
             transition: all 0.4s ease;
         }
-        .btn-shine:hover {
-            transform: translateY(-4px) scale(1.02);
-            box-shadow: 0 20px 40px rgba(16, 185, 129, 0.3);
-        }
+        .btn-shine:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 20px 40px rgba(16, 185, 129, 0.3); }
 
-        /* Medal Colors */
-        .rank-1 { color: #ffd700; filter: drop-shadow(0 0 8px #ffd700); }
-        .rank-2 { color: #c0c0c0; filter: drop-shadow(0 0 8px #c0c0c0); }
-        .rank-3 { color: #cd7f32; filter: drop-shadow(0 0 8px #cd7f32); }
+        /* Dev Profiles */
+        .dev-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+        .dev-card:hover { border-color: var(--primary); background: rgba(99, 102, 241, 0.05); }
 
         .loader { border-top-color: transparent; animation: spin 0.8s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         .fade-up { animation: fadeUp 0.6s ease forwards; opacity: 0; }
-        @keyframes fadeUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
+        @keyframes fadeUp { from { transform: translateY(20px); opacity: 1; } to { transform: translateY(0); opacity: 1; } }
     </style>
 </head>
 <body class="min-h-screen">
 
-    <!-- Sidebar (Hamburger Menu) -->
-    <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] hidden opacity-0 transition-opacity duration-300"></div>
+    <!-- Sidebar Overlay -->
+    <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] hidden transition-opacity duration-300"></div>
     
-    <aside id="sidebar" class="fixed top-0 left-0 h-full w-80 glass z-[70] p-8 border-r border-white/10 shadow-2xl">
+    <!-- About Developers Sidebar -->
+    <aside id="sidebar" class="fixed top-0 left-0 h-full w-85 glass z-[70] p-8 border-r shadow-2xl overflow-y-auto">
         <div class="flex justify-between items-center mb-12">
-            <h3 class="text-xs font-black uppercase tracking-[0.3em] text-indigo-400">System Menu</h3>
-            <button onclick="toggleSidebar()" class="text-slate-400 hover:text-white transition">
-                <i class="fas fa-times text-xl"></i>
-            </button>
+            <h3 class="text-xs font-black uppercase tracking-[0.3em] text-indigo-500">About Developers</h3>
+            <button onclick="toggleSidebar()" class="opacity-50 hover:opacity-100 transition"><i class="fas fa-times text-xl"></i></button>
         </div>
 
-        <nav class="space-y-6">
-            <div class="p-6 rounded-2xl bg-white/5 border border-white/10 group hover:border-indigo-500/50 transition-all">
-                <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4">About Developers</p>
-                
-                <!-- Yash Nemade -->
-                <div class="flex items-center space-x-4 mb-6">
-                    <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-cyan-500 flex items-center justify-center font-bold text-white shadow-lg">YN</div>
-                    <div>
-                        <h4 class="text-sm font-bold text-slate-200">Yash Nemade</h4>
-                        <p class="text-[9px] text-slate-500 uppercase tracking-tighter"> MCA Student</p>
-                    </div>
-                </div>
-
-                <!-- Sumit Bombale -->
+        <div class="space-y-6">
+            <!-- Yash Nemade Profile -->
+            <div class="dev-card p-6 rounded-3xl group">
                 <div class="flex items-center space-x-4">
-                    <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center font-bold text-white shadow-lg">SB</div>
+                    <div class="w-14 h-14 rounded-2xl bg-indigo-600 flex items-center justify-center font-bold text-white shadow-lg text-xl">YN</div>
                     <div>
-                        <h4 class="text-sm font-bold text-slate-200">Sumit Bombale</h4>
-                        <p class="text-[9px] text-slate-500 uppercase tracking-tighter"> MCA Student</p>
+                        <h4 class="text-lg font-bold">Yash Nemade</h4>
+                        <p class="text-[10px] text-indigo-400 font-black uppercase tracking-widest">Lead AI Developer</p>
                     </div>
+                </div>
+                <p class="text-xs mt-4 opacity-60 leading-relaxed">MCA Student at DYPIU, specializing in NLP and UI/UX design.</p>
+                <div class="flex space-x-4 mt-6">
+                    <a href="https://github.com/" target="_blank" class="text-slate-400 hover:text-white transition text-lg"><i class="fab fa-github"></i></a>
+                    <a href="https://linkedin.com/" target="_blank" class="text-slate-400 hover:text-indigo-500 transition text-lg"><i class="fab fa-linkedin"></i></a>
                 </div>
             </div>
 
-            <div class="p-6 rounded-2xl bg-indigo-500/10 border border-indigo-500/20">
-                <p class="text-[10px] font-black uppercase tracking-widest text-indigo-400 mb-2">University Project</p>
-                <p class="text-xs text-slate-400 leading-relaxed font-medium">
-                    Advanced Big Data Analytics System for automated recruitment screening.
-                </p>
+            <!-- Sumit Bombale Profile -->
+            <div class="dev-card p-6 rounded-3xl group">
+                <div class="flex items-center space-x-4">
+                    <div class="w-14 h-14 rounded-2xl bg-amber-600 flex items-center justify-center font-bold text-white shadow-lg text-xl">SB</div>
+                    <div>
+                        <h4 class="text-lg font-bold">Sumit Bombale</h4>
+                        <p class="text-[10px] text-amber-500 font-black uppercase tracking-widest">Data Scientist</p>
+                    </div>
+                </div>
+                <p class="text-xs mt-4 opacity-60 leading-relaxed">MCA Student at DYPIU, focused on Big Data Analytics and ML models.</p>
+                <div class="flex space-x-4 mt-6">
+                    <a href="https://github.com/" target="_blank" class="text-slate-400 hover:text-white transition text-lg"><i class="fab fa-github"></i></a>
+                    <a href="https://linkedin.com/" target="_blank" class="text-slate-400 hover:text-amber-500 transition text-lg"><i class="fab fa-linkedin"></i></a>
+                </div>
             </div>
-        </nav>
+
+            <div class="p-6 rounded-3xl bg-indigo-500/10 border border-indigo-500/20 mt-8">
+                <p class="text-[10px] font-black uppercase tracking-widest text-indigo-400 mb-2">Project Info</p>
+                <p class="text-[11px] opacity-60 leading-relaxed">Advanced Big Data Analytics System developed for University Mini-Project 2026.</p>
+            </div>
+        </div>
     </aside>
 
-    <!-- Premium Navbar -->
+    <!-- Navbar -->
     <nav class="border-b border-white/5 glass sticky top-0 z-50">
         <div class="container mx-auto px-8 py-4 flex justify-between items-center">
             <div class="flex items-center space-x-6">
                 <button onclick="toggleSidebar()" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-indigo-500/20 transition-all border border-white/10 group">
-                    <i class="fas fa-bars-staggered text-indigo-400 group-hover:scale-110"></i>
+                    <i class="fas fa-bars-staggered text-indigo-400"></i>
                 </button>
                 <div class="flex items-center space-x-4">
-                    <div class="p-2 bg-indigo-600 rounded-xl shadow-lg shadow-indigo-500/30">
+                    <div class="p-2 bg-indigo-600 rounded-xl shadow-lg">
                         <i class="fas fa-robot text-white text-xl"></i>
                     </div>
                     <div>
                         <h1 class="text-xl font-extrabold tracking-tighter leading-none uppercase">AI<span class="text-indigo-400">Smart</span>Resume</h1>
-                        <p class="text-[9px] uppercase tracking-[0.3em] text-slate-500 font-black mt-1">Advanced Big Data Analytics</p>
+                        <p class="text-[9px] uppercase tracking-[0.3em] opacity-40 font-black mt-1">Advanced Big Data Analytics</p>
                     </div>
                 </div>
             </div>
             
-            <div class="flex items-center space-x-6">
-                <div class="hidden lg:flex space-x-2 text-[10px] font-black uppercase tracking-widest text-slate-400">
-                    <span class="px-3 py-1 bg-white/5 rounded-full border border-white/5">Matching System v2.0</span>
-                </div>
-                <button class="w-10 h-10 rounded-xl glass flex items-center justify-center hover:bg-white/10 transition">
-                    <i class="fas fa-shield-halved text-indigo-300"></i>
+            <div class="flex items-center">
+                <!-- Theme Toggle Button -->
+                <button id="theme-btn" onclick="handleThemeToggle()" class="w-10 h-10 rounded-xl glass flex items-center justify-center hover:scale-110 transition-all border border-white/5">
+                    <i id="theme-icon" class="fas fa-moon text-indigo-400"></i>
                 </button>
             </div>
         </div>
     </nav>
 
     <main class="container mx-auto px-6 pt-16 max-w-6xl">
-        <!-- Hero Section -->
+        <!-- Hero -->
         <div class="text-center mb-20">
             <div class="inline-flex items-center space-x-2 px-4 py-1.5 mb-6 rounded-full bg-indigo-500/10 border border-indigo-500/20">
                 <span class="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-300">NLP Powered Job Matching System</span>
@@ -149,13 +163,12 @@
             </h2>
             <div class="h-1.5 w-32 bg-indigo-600 mx-auto rounded-full mb-8"></div>
             <p class="text-slate-400 text-lg max-w-2xl mx-auto font-medium">
-                Our AI engine analyzes resume databases to identify top-tier talent using clinical precision and high-dimensional vector space analysis.
+                Identify top-tier talent using clinical precision and high-dimensional vector space analysis.
             </p>
         </div>
 
         <!-- Dashboard Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
-            <!-- Upload Box -->
             <div class="lg:col-span-5 glass p-10 rounded-[2.5rem] hover:border-indigo-500/30 transition-all group">
                 <div class="flex items-center mb-8">
                     <h3 class="text-xl font-bold uppercase tracking-tight">1. Dataset</h3>
@@ -168,7 +181,6 @@
                 </div>
             </div>
 
-            <!-- Profile Box -->
             <div class="lg:col-span-7 glass p-10 rounded-[2.5rem] hover:border-cyan-500/30 transition-all">
                 <div class="flex items-center mb-8">
                     <h3 class="text-xl font-bold uppercase tracking-tight">2. Job Profile</h3>
@@ -180,7 +192,7 @@
             </div>
         </div>
 
-        <!-- Action Center -->
+        <!-- Action Button -->
         <div class="text-center mb-24">
             <button onclick="startAI()" id="btn" class="btn-shine px-24 py-6 rounded-2xl font-black text-white text-lg tracking-[0.2em] uppercase flex items-center mx-auto shadow-2xl">
                 <i class="fas fa-bolt mr-4"></i>
@@ -215,12 +227,40 @@
     </footer>
 
     <script>
+        // --- THEME ENGINE (FIXED) ---
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeUI(savedTheme);
+        }
+
+        function handleThemeToggle() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const target = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', target);
+            localStorage.setItem('theme', target);
+            updateThemeUI(target);
+        }
+
+        function updateThemeUI(theme) {
+            const icon = document.getElementById('theme-icon');
+            if (theme === 'dark') {
+                icon.className = 'fas fa-moon text-indigo-400';
+                document.body.style.background = 'radial-gradient(circle at 0% 0%, #1e1b4b 0%, #050507 50%)';
+            } else {
+                icon.className = 'fas fa-sun text-amber-500';
+                document.body.style.background = '#f1f5f9';
+            }
+        }
+
+        initTheme();
+
+        // --- CORE FUNCTIONS ---
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebar-overlay');
             sidebar.classList.toggle('active');
             overlay.classList.toggle('hidden');
-            setTimeout(() => overlay.classList.toggle('opacity-100'), 50);
         }
 
         document.getElementById('csvFile').onchange = function() {
@@ -235,9 +275,9 @@
             const jd = document.getElementById('jobDesc').value;
             const btn = document.getElementById('btn');
             
-            if(!file || !jd) return alert("Please provide data.");
+            if(!file || !jd) return alert("System requires database and job profile.");
 
-            btn.innerHTML = '<div class="w-5 h-5 border-2 border-white rounded-full loader mr-4"></div> Processing...';
+            btn.innerHTML = '<div class="w-5 h-5 border-2 border-white rounded-full loader mr-4"></div> Computing...';
             btn.disabled = true;
 
             const formData = new FormData();
@@ -249,7 +289,7 @@
                 const data = await response.json();
                 if(data.error) alert(data.error);
                 else showMatches(data.results);
-            } catch (e) { alert("Connection error."); }
+            } catch (e) { alert("Connection Error."); }
             finally {
                 btn.innerHTML = '<i class="fas fa-bolt mr-4"></i><span>Rank Candidates</span>';
                 btn.disabled = false;
@@ -282,7 +322,7 @@
                         <td class="px-10 py-10">
                             <div class="text-xl font-bold">${res.category}</div>
                             <div class="flex items-center mt-1">
-                                <span class="text-[9px] font-black uppercase text-slate-500 tracking-widest">Matched via NLP</span>
+                                <span class="text-[9px] font-black uppercase text-slate-500 tracking-widest">Matched via NLP Engine</span>
                             </div>
                         </td>
                         <td class="px-10 py-10 text-right">
