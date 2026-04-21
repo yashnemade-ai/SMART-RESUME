@@ -1,1 +1,245 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Smart Resume | Screening & Matching</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-body: #0a0a0c;
+            --bg-card: rgba(22, 22, 26, 0.85);
+            --text-main: #fcfcfc;
+            --text-muted: #9ba1b1;
+            --border-color: rgba(139, 92, 246, 0.2);
+            --primary: #8b5cf6; /* Indigo */
+            --accent: #f59e0b;  /* Amber */
+            --action: #06b6d4;  /* Cyan/Teal for Button */
+        }
 
+        [data-theme="light"] {
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #1e1b4b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --primary: #6366f1;
+            --accent: #d97706;
+            --action: #0891b2;
+        }
+
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: var(--bg-body); 
+            color: var(--text-main);
+            transition: all 0.4s ease;
+        }
+
+        .glass-card { 
+            background: var(--bg-card); 
+            border: 1px solid var(--border-color); 
+            backdrop-filter: blur(16px); 
+        }
+
+        /* Unique Action Button Color */
+        .btn-action { 
+            background: linear-gradient(135deg, #0891b2 0%, #10b981 100%); 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-action:hover { 
+            transform: translateY(-3px) scale(1.02); 
+            box-shadow: 0 15px 30px -10px rgba(16, 185, 129, 0.5); 
+        }
+        
+        .text-accent { color: var(--accent); }
+        .loader { border-top-color: transparent; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- Navbar -->
+    <nav class="border-b border-slate-800/50 glass-card sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <i class="fas fa-robot text-white text-xl"></i>
+                </div>
+                <h1 class="text-xl font-extrabold tracking-tighter">AI<span class="text-accent">SMARTRESUME</span></h1>
+            </div>
+            
+            <div class="flex items-center space-x-6">
+                <span class="hidden lg:block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 border border-slate-800 px-3 py-1 rounded">Advanced Big Data Analytics</span>
+                <button onclick="toggleTheme()" class="w-10 h-10 rounded-full glass-card flex items-center justify-center hover:bg-slate-800 transition" id="themeBtn">
+                    <i class="fas fa-moon text-indigo-400" id="themeIcon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto px-6 py-12 max-w-5xl">
+        <!-- Main Title Section -->
+        <div class="text-center mb-16">
+            <div class="inline-block px-4 py-1 mb-4 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-bold uppercase tracking-widest">
+                Automated Recruitment Engine
+            </div>
+            <h2 class="text-4xl md:text-6xl font-black mb-2 leading-tight">
+                SMART RESUME SCREENING
+            </h2>
+            <h3 class="text-2xl md:text-3xl font-bold text-accent mb-6">
+                & JOB MATCHING SYSTEM
+            </h3>
+            <div class="h-1 w-24 bg-indigo-600 mx-auto rounded-full mb-6"></div>
+            <p class="text-muted text-lg max-w-2xl mx-auto italic" style="color: var(--text-muted)">
+                Optimizing Talent Acquisition through Intelligent Data Analysis
+            </p>
+        </div>
+
+        <!-- Input Section -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            <div class="glass-card p-8 rounded-[2rem] hover:border-indigo-500/50 transition-all duration-500">
+                <div class="flex items-center mb-6">
+                    <div class="w-12 h-12 bg-indigo-500/10 rounded-2xl flex items-center justify-center mr-4">
+                        <i class="fas fa-database text-indigo-500 text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold">Upload Database</h3>
+                </div>
+                <div class="border-2 border-dashed border-slate-700 rounded-3xl p-10 text-center cursor-pointer hover:bg-indigo-500/5 transition" onclick="document.getElementById('csvFile').click()">
+                    <input type="file" id="csvFile" accept=".csv" class="hidden">
+                    <i class="fas fa-file-csv text-5xl mb-4 text-slate-600"></i>
+                    <p id="fileName" class="text-sm font-semibold text-slate-500">Attach Resume Dataset (CSV)</p>
+                </div>
+            </div>
+
+            <div class="glass-card p-8 rounded-[2rem] hover:border-amber-500/50 transition-all duration-500">
+                <div class="flex items-center mb-6">
+                    <div class="w-12 h-12 bg-amber-500/10 rounded-2xl flex items-center justify-center mr-4">
+                        <i class="fas fa-id-card-alt text-amber-500 text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold">Job Profile</h3>
+                </div>
+                <textarea id="jobDesc" rows="5" 
+                    class="w-full bg-slate-900/20 border border-slate-700 rounded-2xl p-4 outline-none focus:ring-2 focus:ring-amber-500 transition-all resize-none"
+                    placeholder="Describe the candidate requirements..."></textarea>
+            </div>
+        </div>
+
+        <!-- Distinct Action Button -->
+        <div class="text-center mb-20">
+            <button onclick="startAI()" id="btn" class="btn-action px-20 py-5 rounded-2xl font-black text-white text-lg tracking-[0.1em] uppercase flex items-center mx-auto shadow-2xl">
+                <i class="fas fa-bolt mr-3"></i> Rank Candidates
+            </button>
+        </div>
+
+        <!-- Results Display -->
+        <div id="resultsSection" class="hidden animate-in fade-in slide-in-from-bottom-10 duration-700">
+            <div class="flex items-center justify-between mb-8 px-4">
+                <h3 class="text-3xl font-black">RANKING REPORT</h3>
+                <span id="countBadge" class="bg-indigo-500/20 text-indigo-400 px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest border border-indigo-500/30"></span>
+            </div>
+            
+            <div class="glass-card rounded-[2.5rem] overflow-hidden shadow-2xl">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="bg-indigo-500/5 border-b border-indigo-500/10">
+                            <th class="px-8 py-6 text-xs uppercase font-black text-slate-500 tracking-widest">Rank</th>
+                            <th class="px-8 py-6 text-xs uppercase font-black text-slate-500 tracking-widest">Candidate Profile</th>
+                            <th class="px-8 py-6 text-xs uppercase font-black text-slate-500 text-right tracking-widest">Match Strength</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsTable" class="divide-y divide-slate-800/50"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <footer class="py-12 border-t border-slate-900 text-center">
+        <p class="text-xs font-bold text-slate-600 uppercase tracking-[0.3em]">Advanced Big Data Analytics &bull; 2025</p>
+    </footer>
+
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const icon = document.getElementById('themeIcon');
+            if (html.getAttribute('data-theme') === 'dark') {
+                html.setAttribute('data-theme', 'light');
+                icon.className = 'fas fa-sun text-amber-600';
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                icon.className = 'fas fa-moon text-indigo-400';
+            }
+        }
+
+        document.getElementById('csvFile').onchange = function() {
+            if(this.files[0]) {
+                document.getElementById('fileName').innerHTML = this.files[0].name;
+                document.getElementById('fileName').className = 'text-indigo-400 font-bold';
+            }
+        };
+
+        async function startAI() {
+            const file = document.getElementById('csvFile').files[0];
+            const jd = document.getElementById('jobDesc').value;
+            const btn = document.getElementById('btn');
+            
+            if(!file || !jd) return alert("System Error: Inputs missing.");
+
+            btn.innerHTML = '<div class="w-5 h-5 border-2 border-white rounded-full loader mr-3"></div> Processing Results...';
+            btn.disabled = true;
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('job_description', jd);
+
+            try {
+                const response = await fetch('/predict', { method: 'POST', body: formData });
+                const data = await response.json();
+                if(data.error) alert(data.error);
+                else showMatches(data.results);
+            } catch (e) {
+                alert("Connection failed.");
+            } finally {
+                btn.innerHTML = '<i class="fas fa-bolt mr-3"></i> Rank Candidates';
+                btn.disabled = false;
+            }
+        }
+
+        function showMatches(results) {
+            const table = document.getElementById('resultsTable');
+            const section = document.getElementById('resultsSection');
+            const badge = document.getElementById('countBadge');
+            
+            table.innerHTML = '';
+            section.classList.remove('hidden');
+            badge.innerHTML = `${results.length} Candidates Screened`;
+
+            results.forEach(res => {
+                const accentClass = res.score > 65 ? 'text-amber-500' : 'text-indigo-400';
+                table.innerHTML += `
+                    <tr class="hover:bg-indigo-500/5 transition-all group">
+                        <td class="px-8 py-7">
+                            <span class="w-10 h-10 rounded-lg bg-indigo-500/5 flex items-center justify-center font-black text-indigo-500 border border-indigo-500/10">
+                                ${res.rank}
+                            </span>
+                        </td>
+                        <td class="px-8 py-7">
+                            <div class="text-lg font-bold">${res.category}</div>
+                            <div class="text-[10px] uppercase text-slate-500 font-black tracking-[0.2em] mt-1">Profile Category</div>
+                        </td>
+                        <td class="px-8 py-7 text-right">
+                            <span class="text-2xl font-black ${accentClass}">${res.score}%</span>
+                            <div class="w-32 h-1 bg-slate-800 rounded-full mt-2 ml-auto overflow-hidden">
+                                <div class="h-full bg-accent shadow-[0_0_10px_rgba(245,158,11,0.5)]" style="width: ${res.score}%"></div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            window.scrollTo({ top: section.offsetTop - 50, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
