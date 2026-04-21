@@ -218,12 +218,17 @@
             padding: 1.5rem;
         }
 
-        .dev-card-premium:hover {
-            border: 2px solid #ffffff !important; /* Pure White Border */
-            box-shadow: 0 0 30px rgba(255, 255, 255, 0.3); /* Subtle White Glow */
-            transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.05) !important;
-        }
+/* Dark Theme → White Border + Glow */
+[data-theme="dark"] .dev-card-premium:hover {
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+}
+
+/* Light Theme → Black Border + Glow */
+[data-theme="light"] .dev-card-premium:hover {
+    border: 2px solid #000000;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+}
         /* Larger Interactive Social Icons */
         .social-icon {
             font-size: 1.6rem;
