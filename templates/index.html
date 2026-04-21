@@ -9,7 +9,7 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>">
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Visualization Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
@@ -28,6 +28,12 @@
             --text: #0f172a;
             --border: rgba(0, 0, 0, 0.1);
             --primary: #4f46e5;
+        }
+
+        /* Specific fix for Job Profile Textarea in Light Mode */
+        [data-theme="light"] #jobDesc {
+            color: #000000 !important;
+            font-weight: 800 !important;
         }
 
         body { 
@@ -73,10 +79,8 @@
 </head>
 <body class="min-h-screen">
 
-    <!-- Sidebar Overlay -->
     <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] hidden transition-opacity duration-300"></div>
     
-    <!-- Sidebar -->
     <aside id="sidebar" class="fixed top-0 left-0 h-full w-85 glass z-[70] p-8 border-r shadow-2xl overflow-y-auto">
         <div class="flex justify-between items-center mb-12">
             <h3 class="text-xs font-black uppercase tracking-[0.3em] text-indigo-500">About Developers</h3>
@@ -84,7 +88,6 @@
         </div>
 
         <div class="space-y-6">
-            <!-- Yash Nemade Profile -->
             <div class="dev-card p-6 rounded-3xl group">
                 <div class="flex items-center space-x-4">
                     <div class="w-14 h-14 rounded-2xl bg-indigo-600 flex items-center justify-center font-bold text-white shadow-lg text-xl">YN</div>
@@ -93,13 +96,13 @@
                         <p class="text-[10px] text-indigo-400 font-black uppercase tracking-widest">Lead AI Developer</p>
                     </div>
                 </div>
+                <p class="text-xs mt-4 opacity-60 leading-relaxed">MCA Student at DYPIU, specializing in NLP and UI/UX design.</p>
                 <div class="flex space-x-4 mt-6">
                     <a href="https://github.com/yashnemade-ai" target="_blank" class="text-slate-400 hover:text-white transition text-lg"><i class="fab fa-github"></i></a>
-                    <a href="https://www.linkedin.com/in/yash-sanjay-nemade-178581268?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank" target="_blank" class="text-slate-400 hover:text-indigo-500 transition text-lg"><i class="fab fa-linkedin"></i></a>
+                    <a href="https://www.linkedin.com/in/yash-sanjay-nemade-178581268" target="_blank" class="text-slate-400 hover:text-indigo-500 transition text-lg"><i class="fab fa-linkedin"></i></a>
                 </div>
             </div>
 
-            <!-- Sumit Bombale Profile -->
             <div class="dev-card p-6 rounded-3xl group">
                 <div class="flex items-center space-x-4">
                     <div class="w-14 h-14 rounded-2xl bg-amber-600 flex items-center justify-center font-bold text-white shadow-lg text-xl">SB</div>
@@ -108,20 +111,20 @@
                         <p class="text-[10px] text-amber-500 font-black uppercase tracking-widest">Data Scientist</p>
                     </div>
                 </div>
+                <p class="text-xs mt-4 opacity-60 leading-relaxed">MCA Student at DYPIU, focused on Big Data Analytics and ML models.</p>
                 <div class="flex space-x-4 mt-6">
                     <a href="https://github.com/" target="_blank" class="text-slate-400 hover:text-white transition text-lg"><i class="fab fa-github"></i></a>
-                    <a href="https://www.linkedin.com/in/sumit-bombale-aaa253370?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank" class="text-slate-400 hover:text-amber-500 transition text-lg"><i class="fab fa-linkedin"></i></a>
+                    <a href="https://www.linkedin.com/in/sumit-bombale-aaa253370" target="_blank" class="text-slate-400 hover:text-amber-500 transition text-lg"><i class="fab fa-linkedin"></i></a>
                 </div>
             </div>
 
-            <div class="p-6 rounded-3xl bg-indigo-500/10 border border-indigo-500/20 mt-8">
+            <div class="p-6 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 mt-8">
                 <p class="text-[10px] font-black uppercase tracking-widest text-indigo-400 mb-2">Project Info</p>
                 <p class="text-[11px] opacity-60 leading-relaxed">Advanced Big Data Analytics System developed for University Mini-Project 2026.</p>
             </div>
         </div>
     </aside>
 
-    <!-- Premium Navbar -->
     <nav class="border-b border-white/5 glass sticky top-0 z-50">
         <div class="container mx-auto px-8 py-4 flex justify-between items-center">
             <div class="flex items-center space-x-6">
@@ -138,27 +141,21 @@
                     </div>
                 </div>
             </div>
-            
-            <button onclick="handleThemeToggle()" class="w-10 h-10 rounded-xl glass flex items-center justify-center hover:scale-110 transition-all border border-white/5 group">
+            <button id="theme-btn" onclick="handleThemeToggle()" class="w-10 h-10 rounded-xl glass flex items-center justify-center hover:scale-110 transition-all border border-white/5">
                 <i id="theme-icon" class="fas fa-moon text-indigo-400"></i>
             </button>
         </div>
     </nav>
 
-    <main class="container mx-auto px-6 pt-16 max-w-6xl">
-        <!-- Hero Section -->
+    <main class="container mx-auto px-6 pt-16 max-w-6xl pb-10">
         <div class="text-center mb-20">
             <h2 class="text-5xl md:text-7xl font-black mb-4 tracking-tighter leading-tight uppercase">
                 SMART RESUME SCREENING <br> <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">& JOB MATCHING</span>
             </h2>
-            
-<div class="h-1.5 w-32 bg-white mx-auto rounded-full mb-8"></div>
-<p class="text-slate-400 text-lg max-w-2xl mx-auto font-medium"></p>
-            Identify top-tier talent using clinical precision and high-dimensional vector space analysis.
-        </p>
-    </div>
+            <div class="h-1.5 w-32 bg-white mx-auto rounded-full mb-8"></div>
+            <p id="hero-subtitle" class="text-lg max-w-2xl mx-auto font-bold mt-4">Connecting talent to opportunity through intelligent resume insights.</p>
+        </div>
 
-        <!-- Dashboard Inputs -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
             <div class="lg:col-span-5 glass p-10 rounded-[2.5rem] hover:border-indigo-500/30 transition-all group cursor-pointer" onclick="document.getElementById('csvFile').click()">
                 <div class="flex items-center mb-8">
@@ -190,7 +187,6 @@
             </button>
         </div>
 
-        <!-- Results & Visualization Section -->
         <div id="resultsSection" class="hidden space-y-12">
             <!-- Visualization Chart -->
             <div class="glass p-10 rounded-[3rem]">
@@ -200,7 +196,11 @@
                 </div>
             </div>
 
-            <!-- Table Results -->
+            <div class="flex items-end justify-between mb-10 px-4">
+                <h3 class="text-4xl font-black uppercase tracking-tighter">Ranking Report</h3>
+                <div id="countBadge" class="px-6 py-2 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-black uppercase tracking-widest text-indigo-400"></div>
+            </div>
+            
             <div class="glass rounded-[3rem] overflow-hidden">
                 <table class="w-full text-left">
                     <thead>
@@ -208,7 +208,7 @@
                             <th class="px-8 py-6 text-[10px] uppercase font-black text-slate-500 tracking-[0.3em]">Rank</th>
                             <th class="px-8 py-6 text-[10px] uppercase font-black text-slate-500 tracking-[0.3em]">Candidate Name</th>
                             <th class="px-8 py-6 text-[10px] uppercase font-black text-slate-500 tracking-[0.3em]">Professional Category</th>
-                            <th class="px-8 py-6 text-[10px] uppercase font-black text-slate-500 text-right tracking-[0.3em]">Score</th>
+                            <th class="px-8 py-6 text-[10px] uppercase font-black text-slate-500 text-right tracking-[0.3em]">Match Score</th>
                         </tr>
                     </thead>
                     <tbody id="resultsTable" class="divide-y divide-white/5"></tbody>
@@ -224,7 +224,6 @@
     <script>
         let myChart = null;
 
-        // --- THEME ENGINE (FIXED) ---
         function initTheme() {
             const savedTheme = localStorage.getItem('theme') || 'dark';
             document.documentElement.setAttribute('data-theme', savedTheme);
@@ -257,6 +256,7 @@
             const overlay = document.getElementById('sidebar-overlay');
             sidebar.classList.toggle('active');
             overlay.classList.toggle('hidden');
+            setTimeout(() => overlay.classList.toggle('opacity-100'), 50);
         }
 
         document.getElementById('csvFile').onchange = function() {
@@ -298,8 +298,11 @@
         function showMatches(results) {
             const table = document.getElementById('resultsTable');
             const section = document.getElementById('resultsSection');
+            const badge = document.getElementById('countBadge');
+            
             table.innerHTML = '';
             section.classList.remove('hidden');
+            badge.innerHTML = `${results.length} Candidates Screened`;
 
             results.forEach((res, i) => {
                 let rankIcon = '';
@@ -330,15 +333,18 @@
 
         function renderChart(results) {
             const ctx = document.getElementById('matchChart').getContext('2d');
+            const labels = results.map(r => r.name);
+            const scores = results.map(r => r.score);
+
             if(myChart) myChart.destroy();
 
             myChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: results.map(r => r.name),
+                    labels: labels,
                     datasets: [{
                         label: 'Match Confidence (%)',
-                        data: results.map(r => r.score),
+                        data: scores,
                         backgroundColor: 'rgba(99, 102, 241, 0.4)',
                         borderColor: '#6366f1',
                         borderWidth: 2,
