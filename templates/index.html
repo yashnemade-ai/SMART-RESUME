@@ -3,174 +3,224 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Smart Resume | Screening & Matching</title>
+    <title>AI Smart Resume | Premium Screening</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --bg-body: #0a0a0c;
-            --bg-card: rgba(22, 22, 26, 0.85);
-            --text-main: #fcfcfc;
-            --text-muted: #9ba1b1;
-            --border-color: rgba(139, 92, 246, 0.2);
-            --primary: #8b5cf6; /* Indigo */
-            --accent: #f59e0b;  /* Amber */
-            --action: #06b6d4;  /* Cyan/Teal for Button */
-        }
-
-        [data-theme="light"] {
-            --bg-body: #f8fafc;
-            --bg-card: #ffffff;
-            --text-main: #1e1b4b;
-            --text-muted: #64748b;
-            --border-color: #e2e8f0;
+            --bg-deep: #050507;
+            --glass: rgba(17, 18, 23, 0.9);
             --primary: #6366f1;
-            --accent: #d97706;
-            --action: #0891b2;
+            --accent: #f59e0b;
         }
 
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: var(--bg-body); 
-            color: var(--text-main);
+            background: radial-gradient(circle at 0% 0%, #1e1b4b 0%, #050507 50%);
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism Refined */
+        .glass { 
+            background: var(--glass); 
+            border: 1px solid rgba(255, 255, 255, 0.05); 
+            backdrop-filter: blur(25px); 
+        }
+
+        /* Sidebar Style */
+        #sidebar {
+            transform: translateX(-100%);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #sidebar.active {
+            transform: translateX(0);
+        }
+
+        /* Modern Gradient Button */
+        .btn-shine {
+            background: linear-gradient(135deg, #0891b2 0%, #10b981 100%);
             transition: all 0.4s ease;
         }
-
-        .glass-card { 
-            background: var(--bg-card); 
-            border: 1px solid var(--border-color); 
-            backdrop-filter: blur(16px); 
+        .btn-shine:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(16, 185, 129, 0.3);
         }
 
-        /* Unique Action Button Color */
-        .btn-action { 
-            background: linear-gradient(135deg, #0891b2 0%, #10b981 100%); 
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .btn-action:hover { 
-            transform: translateY(-3px) scale(1.02); 
-            box-shadow: 0 15px 30px -10px rgba(16, 185, 129, 0.5); 
-        }
-        
-        .text-accent { color: var(--accent); }
-        .loader { border-top-color: transparent; animation: spin 1s linear infinite; }
+        /* Medal Colors */
+        .rank-1 { color: #ffd700; filter: drop-shadow(0 0 8px #ffd700); }
+        .rank-2 { color: #c0c0c0; filter: drop-shadow(0 0 8px #c0c0c0); }
+        .rank-3 { color: #cd7f32; filter: drop-shadow(0 0 8px #cd7f32); }
+
+        .loader { border-top-color: transparent; animation: spin 0.8s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .fade-up { animation: fadeUp 0.6s ease forwards; opacity: 0; }
+        @keyframes fadeUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
     </style>
 </head>
 <body class="min-h-screen">
 
-    <!-- Navbar -->
-    <nav class="border-b border-slate-800/50 glass-card sticky top-0 z-50">
-        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-                    <i class="fas fa-robot text-white text-xl"></i>
+    <!-- Sidebar (Hamburger Menu) -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] hidden opacity-0 transition-opacity duration-300"></div>
+    
+    <aside id="sidebar" class="fixed top-0 left-0 h-full w-80 glass z-[70] p-8 border-r border-white/10 shadow-2xl">
+        <div class="flex justify-between items-center mb-12">
+            <h3 class="text-xs font-black uppercase tracking-[0.3em] text-indigo-400">System Menu</h3>
+            <button onclick="toggleSidebar()" class="text-slate-400 hover:text-white transition">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+
+        <nav class="space-y-6">
+            <div class="p-6 rounded-2xl bg-white/5 border border-white/10 group hover:border-indigo-500/50 transition-all">
+                <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4">About Developers</p>
+                
+                <!-- Yash Nemade -->
+                <div class="flex items-center space-x-4 mb-6">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-cyan-500 flex items-center justify-center font-bold text-white shadow-lg">YN</div>
+                    <div>
+                        <h4 class="text-sm font-bold text-slate-200">Yash Nemade</h4>
+                        <p class="text-[9px] text-slate-500 uppercase tracking-tighter"> MCA Student</p>
+                    </div>
                 </div>
-                <h1 class="text-xl font-extrabold tracking-tighter">AI<span class="text-accent">SMARTRESUME</span></h1>
+
+                <!-- Sumit Bombale -->
+                <div class="flex items-center space-x-4">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center font-bold text-white shadow-lg">SB</div>
+                    <div>
+                        <h4 class="text-sm font-bold text-slate-200">Sumit Bombale</h4>
+                        <p class="text-[9px] text-slate-500 uppercase tracking-tighter"> MCA Student</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6 rounded-2xl bg-indigo-500/10 border border-indigo-500/20">
+                <p class="text-[10px] font-black uppercase tracking-widest text-indigo-400 mb-2">University Project</p>
+                <p class="text-xs text-slate-400 leading-relaxed font-medium">
+                    Advanced Big Data Analytics System for automated recruitment screening.
+                </p>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Premium Navbar -->
+    <nav class="border-b border-white/5 glass sticky top-0 z-50">
+        <div class="container mx-auto px-8 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-6">
+                <button onclick="toggleSidebar()" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-indigo-500/20 transition-all border border-white/10 group">
+                    <i class="fas fa-bars-staggered text-indigo-400 group-hover:scale-110"></i>
+                </button>
+                <div class="flex items-center space-x-4">
+                    <div class="p-2 bg-indigo-600 rounded-xl shadow-lg shadow-indigo-500/30">
+                        <i class="fas fa-robot text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-extrabold tracking-tighter leading-none uppercase">AI<span class="text-indigo-400">Smart</span>Resume</h1>
+                        <p class="text-[9px] uppercase tracking-[0.3em] text-slate-500 font-black mt-1">Advanced Big Data Analytics</p>
+                    </div>
+                </div>
             </div>
             
             <div class="flex items-center space-x-6">
-                <span class="hidden lg:block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 border border-slate-800 px-3 py-1 rounded">Advanced Big Data Analytics</span>
-                <button onclick="toggleTheme()" class="w-10 h-10 rounded-full glass-card flex items-center justify-center hover:bg-slate-800 transition" id="themeBtn">
-                    <i class="fas fa-moon text-indigo-400" id="themeIcon"></i>
+                <div class="hidden lg:flex space-x-2 text-[10px] font-black uppercase tracking-widest text-slate-400">
+                    <span class="px-3 py-1 bg-white/5 rounded-full border border-white/5">Matching System v2.0</span>
+                </div>
+                <button class="w-10 h-10 rounded-xl glass flex items-center justify-center hover:bg-white/10 transition">
+                    <i class="fas fa-shield-halved text-indigo-300"></i>
                 </button>
             </div>
         </div>
     </nav>
 
-    <main class="container mx-auto px-6 py-12 max-w-5xl">
-        <!-- Main Title Section -->
-        <div class="text-center mb-16">
-            <div class="inline-block px-4 py-1 mb-4 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-bold uppercase tracking-widest">
-                Automated Recruitment Engine
+    <main class="container mx-auto px-6 pt-16 max-w-6xl">
+        <!-- Hero Section -->
+        <div class="text-center mb-20">
+            <div class="inline-flex items-center space-x-2 px-4 py-1.5 mb-6 rounded-full bg-indigo-500/10 border border-indigo-500/20">
+                <span class="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-300">NLP Powered Job Matching System</span>
             </div>
-            <h2 class="text-4xl md:text-6xl font-black mb-2 leading-tight">
-                SMART RESUME SCREENING
+            <h2 class="text-5xl md:text-7xl font-black mb-4 tracking-tighter leading-tight uppercase">
+                SMART RESUME SCREENING <br> <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">& JOB MATCHING</span>
             </h2>
-            <h3 class="text-2xl md:text-3xl font-bold text-accent mb-6">
-                & JOB MATCHING SYSTEM
-            </h3>
-            <div class="h-1 w-24 bg-indigo-600 mx-auto rounded-full mb-6"></div>
-            <p class="text-muted text-lg max-w-2xl mx-auto italic" style="color: var(--text-muted)">
-                Optimizing Talent Acquisition through Intelligent Data Analysis
+            <div class="h-1.5 w-32 bg-indigo-600 mx-auto rounded-full mb-8"></div>
+            <p class="text-slate-400 text-lg max-w-2xl mx-auto font-medium">
+                Our AI engine analyzes resume databases to identify top-tier talent using clinical precision and high-dimensional vector space analysis.
             </p>
         </div>
 
-        <!-- Input Section -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-            <div class="glass-card p-8 rounded-[2rem] hover:border-indigo-500/50 transition-all duration-500">
-                <div class="flex items-center mb-6">
-                    <div class="w-12 h-12 bg-indigo-500/10 rounded-2xl flex items-center justify-center mr-4">
-                        <i class="fas fa-database text-indigo-500 text-xl"></i>
-                    </div>
-                    <h3 class="text-xl font-bold">Upload Database</h3>
+        <!-- Dashboard Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
+            <!-- Upload Box -->
+            <div class="lg:col-span-5 glass p-10 rounded-[2.5rem] hover:border-indigo-500/30 transition-all group">
+                <div class="flex items-center mb-8">
+                    <h3 class="text-xl font-bold uppercase tracking-tight">1. Dataset</h3>
+                    <i class="fas fa-database ml-auto text-indigo-500/50"></i>
                 </div>
-                <div class="border-2 border-dashed border-slate-700 rounded-3xl p-10 text-center cursor-pointer hover:bg-indigo-500/5 transition" onclick="document.getElementById('csvFile').click()">
+                <div class="border-2 border-dashed border-white/10 rounded-3xl p-12 text-center cursor-pointer hover:bg-white/5 transition-all" onclick="document.getElementById('csvFile').click()">
                     <input type="file" id="csvFile" accept=".csv" class="hidden">
-                    <i class="fas fa-file-csv text-5xl mb-4 text-slate-600"></i>
-                    <p id="fileName" class="text-sm font-semibold text-slate-500">Attach Resume Dataset (CSV)</p>
+                    <i class="fas fa-file-csv text-5xl mb-6 text-slate-700 group-hover:text-indigo-400"></i>
+                    <p id="fileName" class="text-sm font-bold text-slate-500 group-hover:text-slate-200 uppercase tracking-widest">Select Database (CSV)</p>
                 </div>
             </div>
 
-            <div class="glass-card p-8 rounded-[2rem] hover:border-amber-500/50 transition-all duration-500">
-                <div class="flex items-center mb-6">
-                    <div class="w-12 h-12 bg-amber-500/10 rounded-2xl flex items-center justify-center mr-4">
-                        <i class="fas fa-id-card-alt text-amber-500 text-xl"></i>
-                    </div>
-                    <h3 class="text-xl font-bold">Job Profile</h3>
+            <!-- Profile Box -->
+            <div class="lg:col-span-7 glass p-10 rounded-[2.5rem] hover:border-cyan-500/30 transition-all">
+                <div class="flex items-center mb-8">
+                    <h3 class="text-xl font-bold uppercase tracking-tight">2. Job Profile</h3>
+                    <i class="fas fa-briefcase ml-auto text-cyan-500/50"></i>
                 </div>
                 <textarea id="jobDesc" rows="5" 
-                    class="w-full bg-slate-900/20 border border-slate-700 rounded-2xl p-4 outline-none focus:ring-2 focus:ring-amber-500 transition-all resize-none"
-                    placeholder="Describe the candidate requirements..."></textarea>
+                    class="w-full bg-white/5 border border-white/10 rounded-3xl p-6 outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all resize-none text-slate-200 placeholder:text-slate-600"
+                    placeholder="Enter skills and requirements..."></textarea>
             </div>
         </div>
 
-        <!-- Distinct Action Button -->
-        <div class="text-center mb-20">
-            <button onclick="startAI()" id="btn" class="btn-action px-20 py-5 rounded-2xl font-black text-white text-lg tracking-[0.1em] uppercase flex items-center mx-auto shadow-2xl">
-                <i class="fas fa-bolt mr-3"></i> Rank Candidates
+        <!-- Action Center -->
+        <div class="text-center mb-24">
+            <button onclick="startAI()" id="btn" class="btn-shine px-24 py-6 rounded-2xl font-black text-white text-lg tracking-[0.2em] uppercase flex items-center mx-auto shadow-2xl">
+                <i class="fas fa-bolt mr-4"></i>
+                <span>Rank Candidates</span>
             </button>
         </div>
 
-        <!-- Results Display -->
-        <div id="resultsSection" class="hidden animate-in fade-in slide-in-from-bottom-10 duration-700">
-            <div class="flex items-center justify-between mb-8 px-4">
-                <h3 class="text-3xl font-black">RANKING REPORT</h3>
-                <span id="countBadge" class="bg-indigo-500/20 text-indigo-400 px-5 py-2 rounded-xl text-xs font-black uppercase tracking-widest border border-indigo-500/30"></span>
+        <!-- Results Section -->
+        <div id="resultsSection" class="hidden">
+            <div class="flex items-end justify-between mb-10 px-4">
+                <h3 class="text-4xl font-black uppercase tracking-tighter">Ranking Report</h3>
+                <div id="countBadge" class="px-6 py-2 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-black uppercase tracking-widest text-indigo-400"></div>
             </div>
             
-            <div class="glass-card rounded-[2.5rem] overflow-hidden shadow-2xl">
+            <div class="glass rounded-[3rem] overflow-hidden">
                 <table class="w-full text-left">
                     <thead>
-                        <tr class="bg-indigo-500/5 border-b border-indigo-500/10">
-                            <th class="px-8 py-6 text-xs uppercase font-black text-slate-500 tracking-widest">Rank</th>
-                            <th class="px-8 py-6 text-xs uppercase font-black text-slate-500 tracking-widest">Candidate Profile</th>
-                            <th class="px-8 py-6 text-xs uppercase font-black text-slate-500 text-right tracking-widest">Match Strength</th>
+                        <tr class="bg-white/5 border-b border-white/5">
+                            <th class="px-10 py-8 text-[10px] uppercase font-black text-slate-500 tracking-[0.3em]">Rank</th>
+                            <th class="px-10 py-8 text-[10px] uppercase font-black text-slate-500 tracking-[0.3em]">Candidate Category</th>
+                            <th class="px-10 py-8 text-[10px] uppercase font-black text-slate-500 text-right tracking-[0.3em]">Match Score</th>
                         </tr>
                     </thead>
-                    <tbody id="resultsTable" class="divide-y divide-slate-800/50"></tbody>
+                    <tbody id="resultsTable" class="divide-y divide-white/5"></tbody>
                 </table>
             </div>
         </div>
     </main>
 
-    <footer class="py-12 border-t border-slate-900 text-center">
-        <p class="text-xs font-bold text-slate-600 uppercase tracking-[0.3em]">Advanced Big Data Analytics &bull; 2025</p>
+    <footer class="py-12 border-t border-white/5 text-center">
+        <p class="text-[10px] font-black text-slate-600 uppercase tracking-[0.5em]">Advanced Big Data Analytics &bull; 2026</p>
     </footer>
 
     <script>
-        function toggleTheme() {
-            const html = document.documentElement;
-            const icon = document.getElementById('themeIcon');
-            if (html.getAttribute('data-theme') === 'dark') {
-                html.setAttribute('data-theme', 'light');
-                icon.className = 'fas fa-sun text-amber-600';
-            } else {
-                html.setAttribute('data-theme', 'dark');
-                icon.className = 'fas fa-moon text-indigo-400';
-            }
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('hidden');
+            setTimeout(() => overlay.classList.toggle('opacity-100'), 50);
         }
 
         document.getElementById('csvFile').onchange = function() {
@@ -185,9 +235,9 @@
             const jd = document.getElementById('jobDesc').value;
             const btn = document.getElementById('btn');
             
-            if(!file || !jd) return alert("System Error: Inputs missing.");
+            if(!file || !jd) return alert("Please provide data.");
 
-            btn.innerHTML = '<div class="w-5 h-5 border-2 border-white rounded-full loader mr-3"></div> Processing Results...';
+            btn.innerHTML = '<div class="w-5 h-5 border-2 border-white rounded-full loader mr-4"></div> Processing...';
             btn.disabled = true;
 
             const formData = new FormData();
@@ -199,10 +249,9 @@
                 const data = await response.json();
                 if(data.error) alert(data.error);
                 else showMatches(data.results);
-            } catch (e) {
-                alert("Connection failed.");
-            } finally {
-                btn.innerHTML = '<i class="fas fa-bolt mr-3"></i> Rank Candidates';
+            } catch (e) { alert("Connection error."); }
+            finally {
+                btn.innerHTML = '<i class="fas fa-bolt mr-4"></i><span>Rank Candidates</span>';
                 btn.disabled = false;
             }
         }
@@ -216,23 +265,30 @@
             section.classList.remove('hidden');
             badge.innerHTML = `${results.length} Candidates Screened`;
 
-            results.forEach(res => {
-                const accentClass = res.score > 65 ? 'text-amber-500' : 'text-indigo-400';
+            results.forEach((res, i) => {
+                let rankIcon = '';
+                if(res.rank === 1) rankIcon = '<i class="fas fa-crown rank-1 mr-2"></i>';
+                else if(res.rank === 2) rankIcon = '<i class="fas fa-medal rank-2 mr-2"></i>';
+                else if(res.rank === 3) rankIcon = '<i class="fas fa-award rank-3 mr-2"></i>';
+
                 table.innerHTML += `
-                    <tr class="hover:bg-indigo-500/5 transition-all group">
-                        <td class="px-8 py-7">
-                            <span class="w-10 h-10 rounded-lg bg-indigo-500/5 flex items-center justify-center font-black text-indigo-500 border border-indigo-500/10">
-                                ${res.rank}
-                            </span>
+                    <tr class="hover:bg-white/[0.03] transition-all group fade-up" style="animation-delay: ${i * 0.1}s">
+                        <td class="px-10 py-10">
+                            <div class="flex items-center">
+                                ${rankIcon}
+                                <span class="font-black text-xl text-slate-600 group-hover:text-slate-200">#${res.rank}</span>
+                            </div>
                         </td>
-                        <td class="px-8 py-7">
-                            <div class="text-lg font-bold">${res.category}</div>
-                            <div class="text-[10px] uppercase text-slate-500 font-black tracking-[0.2em] mt-1">Profile Category</div>
+                        <td class="px-10 py-10">
+                            <div class="text-xl font-bold">${res.category}</div>
+                            <div class="flex items-center mt-1">
+                                <span class="text-[9px] font-black uppercase text-slate-500 tracking-widest">Matched via NLP</span>
+                            </div>
                         </td>
-                        <td class="px-8 py-7 text-right">
-                            <span class="text-2xl font-black ${accentClass}">${res.score}%</span>
-                            <div class="w-32 h-1 bg-slate-800 rounded-full mt-2 ml-auto overflow-hidden">
-                                <div class="h-full bg-accent shadow-[0_0_10px_rgba(245,158,11,0.5)]" style="width: ${res.score}%"></div>
+                        <td class="px-10 py-10 text-right">
+                            <div class="text-3xl font-black ${res.score > 70 ? 'text-emerald-400' : 'text-indigo-400'}">${res.score}%</div>
+                            <div class="w-40 h-1 bg-white/5 rounded-full mt-3 ml-auto overflow-hidden">
+                                <div class="h-full bg-gradient-to-r from-indigo-600 to-cyan-500 shadow-[0_0_10px_#4f46e5]" style="width: ${res.score}%"></div>
                             </div>
                         </td>
                     </tr>
