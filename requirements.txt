@@ -1,7 +1,6 @@
-streamlit
+flask
 pandas
 numpy
 nltk
 scikit-learn
-matplotlib
-seaborn
+gunicorn
