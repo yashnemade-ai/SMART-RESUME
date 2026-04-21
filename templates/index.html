@@ -59,7 +59,9 @@
         #sidebar {
             transform: translateX(-100%);
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            background: var(--glass); /* Matches the theme */
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(25px);
+           -webkit-backdrop-filter: blur(25px);
             color: var(--text);
             border-right: 1px solid var(--border);
         }
