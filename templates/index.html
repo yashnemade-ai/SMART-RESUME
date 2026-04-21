@@ -102,53 +102,198 @@
     <!-- Sidebar Overlay -->
     <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] hidden transition-opacity duration-300"></div>
     
-    <!-- Sidebar (Theme Responsive) -->
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Smart Resume | Premium Screening</title>
+    
+    <!-- Chrome Tab Logo -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-body: radial-gradient(circle at 0% 0%, #1e1b4b 0%, #050507 50%);
+            --glass: rgba(17, 18, 23, 0.9); /* Night mode sidebar */
+            --text: #f8fafc;
+            --border: rgba(255, 255, 255, 0.05);
+            --primary: #6366f1;
+        }
+
+        [data-theme="light"] {
+            --bg-body: #f1f5f9;
+            --glass: rgba(255, 255, 255, 0.95); /* Day mode sidebar */
+            --text: #0f172a;
+            --border: rgba(0, 0, 0, 0.1);
+            --primary: #4f46e5;
+        }
+
+        /* Hero Subtitle Colors */
+        [data-theme="light"] #hero-subtitle { color: #000000 !important; }
+        [data-theme="dark"] #hero-subtitle { color: #ffffff !important; }
+
+        /* Fix for Job Profile Textarea in Light Mode */
+        [data-theme="light"] #jobDesc {
+            color: #000000 !important;
+            font-weight: 800 !important;
+        }
+
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: var(--bg-body);
+            background-attachment: fixed;
+            color: var(--text);
+            transition: all 0.5s ease;
+            overflow-x: hidden;
+        }
+
+        .glass { 
+            background: var(--glass); 
+            border: 1px solid var(--border); 
+            backdrop-filter: blur(25px); 
+        }
+
+        /* Sidebar - Dynamic Background */
+        #sidebar {
+            transform: translateX(-100%);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--glass); /* Matches the theme */
+            color: var(--text);
+            border-right: 1px solid var(--border);
+        }
+        #sidebar.active { transform: translateX(0); }
+
+        /* Social Icons - Slightly Bigger */
+        .social-link {
+            font-size: 1.4rem; /* Increased size */
+            transition: all 0.3s ease;
+            opacity: 0.6;
+        }
+        .social-link:hover {
+            opacity: 1;
+            transform: scale(1.2);
+            color: var(--primary);
+        }
+
+        .btn-shine {
+            background: linear-gradient(135deg, #0891b2 0%, #10b981 100%);
+            transition: all 0.4s ease;
+        }
+        .btn-shine:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 20px 40px rgba(16, 185, 129, 0.3); }
+
+        .dev-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+        [data-theme="light"] .dev-card { background: rgba(0, 0, 0, 0.02); }
+
+        .loader { border-top-color: transparent; animation: spin 0.8s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .fade-up { animation: fadeUp 0.6s ease forwards; opacity: 0; }
+        @keyframes fadeUp { from { transform: translateY(20px); opacity: 1; } to { transform: translateY(0); opacity: 1; } }
+        
+        /* Sidebar Refined Style */
+        #sidebar {
+            transform: translateX(-100%);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--glass);
+            border-right: 1px solid var(--border);
+        }
+        #sidebar.active { transform: translateX(0); }
+
+ /* Developer Cards - White Border & Glow on Hover */
+        .dev-card-premium {
+            border: 2px solid transparent; 
+            transition: all 0.4s ease;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 2rem;
+            padding: 1.5rem;
+        }
+
+        .dev-card-premium:hover {
+            border: 2px solid #ffffff !important; /* Pure White Border */
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.3); /* Subtle White Glow */
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.05) !important;
+        }
+        /* Larger Interactive Social Icons */
+        .social-icon {
+            font-size: 1.6rem;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: inline-block;
+            color: #94a3b8;
+        }
+        .social-icon:hover {
+            transform: scale(1.3) translateY(-3px);
+            color: #ffffff;
+            filter: drop-shadow(0 0 8px var(--primary));
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- Sidebar Overlay -->
+    <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] hidden transition-opacity duration-300"></div>
+    
+<!-- Premium About Sidebar -->
     <aside id="sidebar" class="fixed top-0 left-0 h-full w-85 z-[70] p-8 overflow-y-auto shadow-2xl">
         <div class="flex justify-between items-center mb-12">
-            <h3 class="text-xs font-black uppercase tracking-[0.3em] opacity-50">About Developers</h3>
-            <button onclick="toggleSidebar()" class="opacity-50 hover:opacity-100 transition"><i class="fas fa-times text-xl"></i></button>
+            <div>
+                <h3 class="text-xs font-black uppercase tracking-[0.4em] text-indigo-500"> ABOUT DEVELOPERS</h3>
+            </div>
+            <button onclick="toggleSidebar()" class="w-8 h-8 rounded-full flex items-center justify-center bg-white/5 hover:bg-white/10 transition">
+                <i class="fas fa-times text-xs opacity-50"></i>
+            </button>
         </div>
 
-        <div class="space-y-6">
+        <div class="space-y-8">
             <!-- Yash Profile -->
-            <div class="dev-card p-6 rounded-3xl group">
-                <div class="flex items-center space-x-4">
+            <div class="dev-card-premium group relative overflow-hidden">
+                <div class="flex items-center space-x-5">
                     <div class="w-14 h-14 rounded-2xl bg-indigo-600 flex items-center justify-center font-bold text-white shadow-lg text-xl">YN</div>
                     <div>
                         <h4 class="text-lg font-bold">Yash Nemade</h4>
-                        <p class="text-[10px] font-black uppercase tracking-widest opacity-60">Lead AI Developer</p>
+                        <p class="text-[9px] text-indigo-400 font-black uppercase tracking-widest mt-0.5">Lead AI Developer</p>
                     </div>
                 </div>
-                <p class="text-xs mt-4 opacity-70 leading-relaxed font-medium">MCA Student at DYPIU, specializing in NLP and UI/UX design.</p>
-                <div class="flex space-x-5 mt-6">
-                    <a href="https://github.com/yashnemade-ai" target="_blank" class="social-link"><i class="fab fa-github"></i></a>
-                    <a href="https://www.linkedin.com/in/yash-sanjay-nemade-178581268" target="_blank" class="social-link"><i class="fab fa-linkedin"></i></a>
+                <p class="text-[11px] mt-4 opacity-60 leading-relaxed font-medium">MCA Student at DYPIU, specializing in NLP and UI/UX design.</p>
+                <div class="flex space-x-6 mt-8">
+                    <a href="https://github.com/yashnemade-ai" target="_blank" class="social-icon"><i class="fab fa-github"></i></a>
+                    <a href="https://www.linkedin.com/in/yash-sanjay-nemade-178581268" target="_blank" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
                 </div>
             </div>
 
             <!-- Sumit Profile -->
-            <div class="dev-card p-6 rounded-3xl group">
-                <div class="flex items-center space-x-4">
+            <div class="dev-card-premium group relative overflow-hidden">
+                <div class="flex items-center space-x-5">
                     <div class="w-14 h-14 rounded-2xl bg-amber-600 flex items-center justify-center font-bold text-white shadow-lg text-xl">SB</div>
                     <div>
                         <h4 class="text-lg font-bold">Sumit Bombale</h4>
-                        <p class="text-[10px] font-black uppercase tracking-widest opacity-60">Data Scientist</p>
+                        <p class="text-[9px] text-amber-500 font-black uppercase tracking-widest mt-0.5">Data Scientist</p>
                     </div>
                 </div>
-                <p class="text-xs mt-4 opacity-70 leading-relaxed font-medium">MCA Student at DYPIU, focused on Big Data Analytics and ML models.</p>
-                <div class="flex space-x-5 mt-6">
-                    <a href="https://github.com/" target="_blank" class="social-link"><i class="fab fa-github"></i></a>
-                    <a href="https://www.linkedin.com/in/sumit-bombale-aaa253370" target="_blank" class="social-link"><i class="fab fa-linkedin"></i></a>
+                <p class="text-[11px] mt-4 opacity-60 leading-relaxed font-medium">MCA Student at DYPIU, focused on Big Data Analytics and ML models.</p>
+                <div class="flex space-x-6 mt-8">
+                    <a href="https://github.com/" target="_blank" class="social-icon"><i class="fab fa-github"></i></a>
+                    <a href="https://www.linkedin.com/in/sumit-bombale-aaa253370" target="_blank" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
                 </div>
             </div>
 
-            <div class="p-6 rounded-3xl bg-indigo-500/10 border border-indigo-500/20 mt-8">
-                <p class="text-[10px] font-black uppercase tracking-widest text-indigo-400 mb-2">Project Info</p>
-                <p class="text-[11px] opacity-60 leading-relaxed">Advanced Big Data Analytics System developed for D.Y.Patil Internationl University Mini-Project 2026.</p>
+            <!-- Project Info -->
+            <div class="p-7 rounded-[1rem] bg-indigo-500/5 border border-indigo-500/10 mt-10">
+                <h4 class="text-lg font-bold">Project Info</h4>
+                <p class="text-[11px] opacity-60 leading-relaxed font-medium">Advanced Big Data Analytics System developed for University Mini-Project 2026.</p>
             </div>
         </div>
     </aside>
-
     <!-- Navbar -->
     <nav class="border-b border-white/5 glass sticky top-0 z-50">
         <div class="container mx-auto px-8 py-4 flex justify-between items-center">
@@ -391,3 +536,4 @@
     </script>
 </body>
 </html>
+              
