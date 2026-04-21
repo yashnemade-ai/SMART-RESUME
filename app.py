@@ -10,7 +10,6 @@ import os
 
 app = Flask(__name__)
 
-# Essential Setup for Speed
 nltk.download('stopwords', quiet=True)
 STOPWORDS = set(stopwords.words("english"))
 STEMMER = PorterStemmer()
@@ -20,7 +19,7 @@ def fast_clean(text):
     if not text or pd.isna(text): return ""
     text = str(text).lower()
     text = CLEAN_PATTERN.sub(' ', text)
-    # Fast Stemming
+
     return " ".join([STEMMER.stem(w) for w in text.split() if w not in STOPWORDS and len(w) > 2])
 
 @app.route('/')
@@ -50,25 +49,22 @@ def predict():
         if not res_key:
             return jsonify({"error": "Resume text column not found"}), 400
 
-        # Memory Optimization: Load only necessary columns
+
         target_cols = [col_map[k] for k in [name_key, res_key, cat_key] if k]
         df = pd.read_csv(file, usecols=target_cols, on_bad_lines='skip', encoding='latin1').head(5000)
         
-        # Column Normalization
+
         df.columns = [str(c).strip().lower() for c in df.columns]
 
-        # Fast Processing
         cleaned_resumes = [fast_clean(r) for r in df[res_key]]
         tfidf = TfidfVectorizer(max_features=1500)
         matrix = tfidf.fit_transform(cleaned_resumes)
         job_vec = tfidf.transform([fast_clean(jd)])
         
-        # Similarity Calculation
         scores = cosine_similarity(matrix, job_vec).flatten()
         df['match_score'] = (scores * 100).round(2)
         
-        # --- CRITICAL FIX: REMOVE 0% MATCHES AND RANK ---
-        # Sirf unhe rakho jinka score 0 se zyada hai
+
         filtered_df = df[df['match_score'] > 0].sort_values(by='match_score', ascending=False).head(15)
         
         if filtered_df.empty:
@@ -83,7 +79,6 @@ def predict():
                 "score": float(row['match_score'])
             })
 
-        # Memory Clean
         del df, matrix, cleaned_resumes, filtered_df
         
         return jsonify({"results": results})
