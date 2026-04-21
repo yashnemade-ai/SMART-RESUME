@@ -18,15 +18,12 @@ nltk.download('omw-1.4', quiet=True)
 
 def perform_nlp_cleaning(text):
     if not isinstance(text, str): return ""
-    # Standardizing for High-Dimensional Vector Space
     text = text.lower()
     text = re.sub(r'http\S+\s*', '', text)
     text = re.sub(r'RT|cc|#\S+|@\S+|[^a-zA-Z ]', ' ', text)
     text = re.sub(r'\s+', ' ', text).strip()
-    
     stop_words = set(stopwords.words("english"))
     lemmatizer = WordNetLemmatizer()
-    # Feature Normalization via Lemmatization
     return " ".join([lemmatizer.lemmatize(w) for w in text.split() if w not in stop_words])
 
 @app.route('/')
@@ -42,14 +39,9 @@ def predict():
     job_description = request.form.get('job_description')
 
     try:
-        # Optimization for Large Datasets (Big Data constraint)
-        # Reading only first 2500 records to maintain speed on Render
         df = pd.read_csv(file, on_bad_lines='skip', encoding='latin1').head(2500)
-        
-        # Header Normalization (Handling BOM and spaces)
         df.columns = df.columns.str.strip().str.lower()
         
-        # Automated Column Detection
         res_col = next((c for c in df.columns if 'resume' in c or 'text' in c), None)
         name_col = next((c for c in df.columns if 'name' in c), None)
         cat_col = next((c for c in df.columns if 'category' in c or 'role' in c), None)
@@ -58,27 +50,24 @@ def predict():
             return jsonify({"error": "Resume Feature Column not detected"}), 400
 
         df = df.dropna(subset=[res_col])
-        
-        # [BIG DATA STEP]: Feature Extraction via TF-IDF Vectorization
         tfidf = TfidfVectorizer(max_features=3000, ngram_range=(1, 2), sublinear_tf=True)
         
-        # Processing Data Stream
         cleaned_resumes = [perform_nlp_cleaning(str(r)) for r in df[res_col]]
         vector_matrix = tfidf.fit_transform(cleaned_resumes)
         
-        # [BIG DATA STEP]: Similarity Measure using Cosine Distance
         job_query_vec = tfidf.transform([perform_nlp_cleaning(job_description)])
         similarity_scores = cosine_similarity(vector_matrix, job_query_vec).flatten()
         
         df['match_confidence'] = (similarity_scores * 100).round(2)
-        
-        # Filtering Zero-Impact Nodes
         ranked_results = df[df['match_confidence'] > 0].sort_values(by='match_confidence', ascending=False).head(15)
         
         if ranked_results.empty:
             return jsonify({"results": [], "message": "No relevant matches in current vector space"})
+        if cat_col:
+            category_counts = ranked_results[cat_col].value_counts().to_dict()
+        else:
+            category_counts = {"General": len(ranked_results)}
 
-        # Constructing Output Payload
         results = []
         for i, row in enumerate(ranked_results.to_dict(orient='records'), 1):
             results.append({
@@ -88,7 +77,10 @@ def predict():
                 "score": float(row.get('match_confidence', 0))
             })
 
-        return jsonify({"results": results})
+        return jsonify({
+            "results": results, 
+            "category_distribution": category_counts
+        })
 
     except Exception as e:
         return jsonify({"error": f"Algorithm Error: {str(e)}"}), 500
