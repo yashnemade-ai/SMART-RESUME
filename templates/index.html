@@ -258,19 +258,19 @@ body {
     <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] hidden transition-opacity duration-300"></div>
     
 <!-- Premium About Sidebar -->
-    <aside id="sidebar" class="fixed top-0 left-0 h-full w-65 z-[70] p-8 overflow-y-auto shadow-2xl">
-        <div class="flex justify-between items-center mb-12">
-            <div>
-                <h3 id="about-text" class="text-xs font-black uppercase tracking-[0.4em]">
-  ABOUT DEVELOPERS
+   <aside id="sidebar" class="fixed top-0 left-0 h-full w-[500px] z-[70] p-8 overflow-y-auto shadow-2xl">
+   <button onclick="toggleSidebar()" 
+    class="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center bg-white/5 hover:bg-white/10 transition">
+    <i class="fas fa-times text-xs opacity-50"></i>
+</button>
+<h3 id="about-text" class="text-sm font-black uppercase tracking-[0.4em] mb-4 text-center">
+    ABOUT DEVELOPERS
 </h3>
             </div>
-            <button onclick="toggleSidebar()" class="w-8 h-8 rounded-full flex items-center justify-center bg-white/5 hover:bg-white/10 transition">
-                <i class="fas fa-times text-xs opacity-50"></i>
-            </button>
+
         </div>
 
-        <div class="space-y-8">
+        <div class="space-y-8 mt-6">
             <!-- Yash Profile -->
             <div class="dev-card-premium group relative overflow-hidden">
                 <div class="flex items-center space-x-5">
